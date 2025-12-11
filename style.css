@@ -3,12 +3,15 @@
   --pnb-blue: #002147;      /* Azul marino oficial */
   --pnb-gold: #D4AF37;      /* Dorado institucional */
   --pnb-light: #f0f4f8;
+  --pnb-white: #ffffff;
 }
 
 body {
   background-color: #f9fbfd;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: #333;
+  margin: 0;
+  padding: 0;
 }
 
 .bg-pnb-dark {
@@ -24,6 +27,9 @@ body {
   color: var(--pnb-blue);
   font-weight: bold;
   border: none;
+  border-radius: 30px;
+  padding: 12px 24px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 .btn-pnb-gold:hover {
@@ -37,10 +43,15 @@ body {
   height: 80px;
   max-width: 100%;
   object-fit: contain;
+  border: 3px solid white;    /* ✅ Borde blanco */
+  border-radius: 8px;         /* Esquinas redondeadas */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
 .card {
   border-radius: 12px !important;
+  border: 1px solid #dee2e6;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
 .estacion-item {
@@ -53,12 +64,13 @@ body {
   justify-content: space-between;
   align-items: center;
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  transition: transform 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .estacion-item:hover {
   transform: translateX(5px);
   background-color: #f0f7ff;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
 .btn-ir {
@@ -69,11 +81,14 @@ body {
   border-radius: 30px;
   font-weight: bold;
   font-size: 0.95rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .btn-ir:hover {
   background-color: #001a38;
   color: white;
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
 /* Responsive */
@@ -92,4 +107,37 @@ body {
   .estacion-item button {
     align-self: flex-end;
   }
+}
+
+/* Estilos adicionales para el selector y contenedor */
+#ccpSelector {
+  font-size: 1.1rem;
+  padding: 12px;
+  border-radius: 8px;
+  border: 2px solid #ced4da;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+#ccpSelector:focus {
+  border-color: var(--pnb-blue);
+  box-shadow: 0 0 0 0.25rem rgba(0, 33, 71, 0.25);
+}
+
+#estacionesContainer {
+  min-height: 200px;
+}
+
+/* Mejora en la cabecera */
+header {
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
+}
+
+header h1 {
+  margin-bottom: 0.5rem;
+}
+
+header p {
+  margin-bottom: 0;
+  opacity: 0.9;
 }
