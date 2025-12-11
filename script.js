@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', async () => {
-  // ✅ Supabase ya está cargado desde index.html
   const { createClient } = window.supabase;
   const supabase = createClient(
     'https://hxkqbszmkxydxxtsvdqb.supabase.co',
@@ -12,26 +11,32 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const select = document.getElementById('ccpSelector');
   const container = document.getElementById('estacionesContainer');
+
   if (!select || !container) return;
 
-  // ✅ CORREGIDO: usa 'data', no 'ccps'
+  // Cargar lista de CCPs
   try {
     const { data, error } = await supabase
       .from('ccps')
       .select('nombre, codigo')
-      .order('nombre');
+      .order('nombre', { ascending: true });
 
     if (error) throw error;
 
-    select.innerHTML = '<option value="">-- Seleccione un CCP --</option>' +
-      data.map(ccp => `<option value="${ccp.codigo}">${ccp.nombre}</option>`).join('');
-
+    select.innerHTML = '<option value="">-- Seleccione un CCP --</option>';
+    data.forEach(ccp => {
+      const option = document.createElement('option');
+      option.value = ccp.codigo;
+      option.textContent = ccp.nombre;
+      select.appendChild(option);
+    });
   } catch (err) {
-    console.error('Error al cargar CCPs:', err);
+    console.error('Error al cargar CCPs:', err.message);
     select.innerHTML = '<option>Error de conexión</option>';
     return;
   }
 
+  // Manejar selección de CCP
   select.addEventListener('change', async (e) => {
     const codigo = e.target.value;
     if (!codigo) {
@@ -42,7 +47,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     container.innerHTML = '<p class="text-muted">Cargando estaciones...</p>';
 
     try {
-      // ✅ CORREGIDO: usa 'data', no 'ccp'
+      // Obtener ID del CCP seleccionado
       const { data: ccpData, error: ccpErr } = await supabase
         .from('ccps')
         .select('id')
@@ -51,32 +56,40 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (ccpErr) throw ccpErr;
 
-      const {  estaciones, error: estErr } = await supabase
+      // Cargar estaciones asociadas
+      const { data: estaciones, error: estErr } = await supabase
         .from('estaciones')
         .select('nombre, lat, lng')
         .eq('ccp_id', ccpData.id)
-        .order('nombre');
+        .order('nombre', { ascending: true });
 
       if (estErr) throw estErr;
 
-      if (estaciones.length === 0) {
+      if (!estaciones || estaciones.length === 0) {
         container.innerHTML = '<p class="text-muted">No hay estaciones registradas para este CCP.</p>';
         return;
       }
 
+      // Renderizar estaciones
+      const html = estaciones.map(est => `
+        <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+          <span class="fw-medium">${est.nombre}</span>
+          <button 
+            class="btn btn-sm btn-outline-primary"
+            onclick="abrirMapa(${est.lat}, ${est.lng})"
+          >
+            Ver en Mapa
+          </button>
+        </div>
+      `).join('');
+
       container.innerHTML = `
         <h5 class="mb-3 fw-bold">Estaciones Policiales:</h5>
-        ${estaciones.map(est => `
-          <div class="estacion-item">
-            <span class="fw-medium">${est.nombre}</span>
-            <button class="btn-ir" onclick="abrirMapa(${est.lat}, ${est.lng})">Ver en Mapa</button>
-          </div>
-        `).join('')}
+        ${html}
       `;
-
     } catch (err) {
-      console.error('Error al cargar estaciones:', err);
-      container.innerHTML = '<p class="text-danger">Error al cargar estaciones.</p>';
+      console.error('Error al cargar estaciones:', err.message);
+      container.innerHTML = '<p class="text-danger">Error al cargar estaciones. Intente nuevamente.</p>';
     }
   });
 });
