@@ -14,12 +14,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   const container = document.getElementById('estacionesContainer');
   if (!select || !container) return;
 
-  // ✅ CORREGIDO: usar 'data', no 'ccps'
+  // ✅ CORREGIDO: usa 'data', no 'ccps'
   try {
     const { data, error } = await supabase
       .from('ccps')
       .select('nombre, codigo')
-      .order('nombre', { ascending: true });
+      .order('nombre');
 
     if (error) throw error;
 
@@ -32,7 +32,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  // Cargar estaciones
   select.addEventListener('change', async (e) => {
     const codigo = e.target.value;
     if (!codigo) {
@@ -43,7 +42,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     container.innerHTML = '<p class="text-muted">Cargando estaciones...</p>';
 
     try {
-      // ✅ CORREGIDO: usar 'data', no 'ccp'
+      // ✅ CORREGIDO: usa 'data', no 'ccp'
       const { data: ccpData, error: ccpErr } = await supabase
         .from('ccps')
         .select('id')
@@ -52,11 +51,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (ccpErr) throw ccpErr;
 
-      const { data: estaciones, error: estErr } = await supabase
+      const {  estaciones, error: estErr } = await supabase
         .from('estaciones')
         .select('nombre, lat, lng')
         .eq('ccp_id', ccpData.id)
-        .order('nombre', { ascending: true });
+        .order('nombre');
 
       if (estErr) throw estErr;
 
