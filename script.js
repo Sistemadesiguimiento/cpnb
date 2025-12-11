@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', async () => {
+  // Verificación de Supabase
   if (!window.supabase) {
     console.error('❌ Supabase no está cargado. Verifica el orden de los scripts.');
     document.getElementById('ccpSelector').innerHTML = '<option>❌ Error: librería no cargada</option>';
@@ -11,6 +12,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh4a3Fic3pta3h5ZHh4dHN2ZHFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0ODEyMTAsImV4cCI6MjA4MTA1NzIxMH0.Fs504W-L-KqtKcVfLx57BeMomPAMB5NZ_dsrF2YpBw8'
   );
 
+  // Función global para abrir en Google Maps
   window.abrirMapa = (lat, lng) => {
     window.open(`https://www.google.com/maps?q=${lat},${lng}&z=16`, '_blank');
   };
@@ -36,7 +38,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  // Al seleccionar un CCP
+  // Manejar cambio de selección
   select.addEventListener('change', async (e) => {
     const codigo = e.target.value;
     if (!codigo) {
@@ -47,7 +49,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     container.innerHTML = '<p class="text-muted">Cargando estaciones...</p>';
 
     try {
-      const {  ccpData, error: ccpErr } = await supabase
+      // Obtener ID del CCP por su código
+      const {  ccp, error: ccpErr } = await supabase
         .from('ccps')
         .select('id')
         .eq('codigo', codigo)
@@ -55,10 +58,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (ccpErr) throw ccpErr;
 
+      // Cargar estaciones asociadas
       const {  estaciones, error: estErr } = await supabase
         .from('estaciones')
         .select('nombre, lat, lng')
-        .eq('ccp_id', ccpData.id)
+        .eq('ccp_id', ccp.id)
         .order('nombre', { ascending: true });
 
       if (estErr) throw estErr;
@@ -68,7 +72,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
       }
 
-      // Render con estilos de Bootstrap
+      // Render con Bootstrap
       let html = '<h5 class="mb-3 fw-bold">Estaciones Policiales:</h5>';
       estaciones.forEach(est => {
         html += `
@@ -83,7 +87,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       container.innerHTML = html;
     } catch (err) {
       console.error('Error al cargar estaciones:', err.message);
-      container.innerHTML = '<p class="text-danger">❌ Error al cargar estaciones.</p>';
+      container.innerHTML = '<p class="text-danger">❌ Error al cargar estaciones. Ver consola.</p>';
     }
   });
 });
