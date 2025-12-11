@@ -1,93 +1,69 @@
-document.addEventListener('DOMContentLoaded', async () => {
-  // Verificación de Supabase
-  if (!window.supabase) {
-    console.error('❌ Supabase no está cargado. Verifica el orden de los scripts.');
-    document.getElementById('ccpSelector').innerHTML = '<option>❌ Error: librería no cargada</option>';
+// script.js
+
+// ⚙️ Configura tu cliente de Supabase
+const supabaseUrl = 'https://hxkqbszmkxydxxtsvdqb.supabase.co';
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh4a3Fic3pta3h5ZHh4dHN2ZHFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0ODEyMTAsImV4cCI6MjA4MTA1NzIxMH0.Fs504W-L-KqtKcVfLx57BeMomPAMB5NZ_dsrF2YpBw8';
+const supabase = supabase.createClient(supabaseUrl, supabaseAnonKey);
+
+const ccpSelector = document.getElementById('ccpSelector');
+const estacionesContainer = document.getElementById('estacionesContainer');
+
+// 🔄 Cargar lista de CCP al iniciar
+async function cargarCCPs() {
+  const { data, error } = await supabase.from('ccp').select('id, nombre').order('nombre', { ascending: true });
+  if (error) {
+    console.error('Error al cargar CCPs:', error);
     return;
   }
 
-  const { createClient } = window.supabase;
-  const supabase = createClient(
-    'https://hxkqbszmkxydxxtsvdqb.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh4a3Fic3pta3h5ZHh4dHN2ZHFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0ODEyMTAsImV4cCI6MjA4MTA1NzIxMH0.Fs504W-L-KqtKcVfLx57BeMomPAMB5NZ_dsrF2YpBw8'
-  );
-
-  // Función global para abrir en Google Maps
-  window.abrirMapa = (lat, lng) => {
-    window.open(`https://www.google.com/maps?q=${lat},${lng}&z=16`, '_blank');
-  };
-
-  const select = document.getElementById('ccpSelector');
-  const container = document.getElementById('estacionesContainer');
-  if (!select || !container) return;
-
-  // Cargar lista de CCPs
-  try {
-    const { data, error } = await supabase
-      .from('ccps')
-      .select('nombre, codigo')
-      .order('nombre', { ascending: true });
-
-    if (error) throw error;
-
-    select.innerHTML = '<option value="">-- Seleccione un CCP --</option>' +
-      data.map(ccp => `<option value="${ccp.codigo}">${ccp.nombre}</option>`).join('');
-  } catch (err) {
-    console.error('Error al cargar CCPs:', err.message);
-    select.innerHTML = '<option>❌ Error al cargar CCPs</option>';
-    return;
-  }
-
-  // Manejar cambio de selección
-  select.addEventListener('change', async (e) => {
-    const codigo = e.target.value;
-    if (!codigo) {
-      container.innerHTML = '<p class="text-muted text-center">Seleccione un CCP para visualizar sus estaciones policiales.</p>';
-      return;
-    }
-
-    container.innerHTML = '<p class="text-muted">Cargando estaciones...</p>';
-
-    try {
-      // Obtener ID del CCP por su código
-      const {  ccp, error: ccpErr } = await supabase
-        .from('ccps')
-        .select('id')
-        .eq('codigo', codigo)
-        .single();
-
-      if (ccpErr) throw ccpErr;
-
-      // Cargar estaciones asociadas
-      const {  estaciones, error: estErr } = await supabase
-        .from('estaciones')
-        .select('nombre, lat, lng')
-        .eq('ccp_id', ccp.id)
-        .order('nombre', { ascending: true });
-
-      if (estErr) throw estErr;
-
-      if (!estaciones || estaciones.length === 0) {
-        container.innerHTML = '<p class="text-muted">No hay estaciones registradas para este CCP.</p>';
-        return;
-      }
-
-      // Render con Bootstrap
-      let html = '<h5 class="mb-3 fw-bold">Estaciones Policiales:</h5>';
-      estaciones.forEach(est => {
-        html += `
-          <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
-            <span class="fw-medium">${est.nombre}</span>
-            <button class="btn btn-sm btn-outline-primary" onclick="abrirMapa(${est.lat}, ${est.lng})">
-              Ver en Mapa
-            </button>
-          </div>
-        `;
-      });
-      container.innerHTML = html;
-    } catch (err) {
-      console.error('Error al cargar estaciones:', err.message);
-      container.innerHTML = '<p class="text-danger">❌ Error al cargar estaciones. Ver consola.</p>';
-    }
+  ccpSelector.innerHTML = '<option value="">-- Seleccione un CCP --</option>';
+  data.forEach(ccp => {
+    const option = document.createElement('option');
+    option.value = ccp.id;
+    option.textContent = ccp.nombre;
+    ccpSelector.appendChild(option);
   });
+}
+
+// 📍 Cargar estaciones al seleccionar un CCP
+ccpSelector.addEventListener('change', async () => {
+  const ccpId = ccpSelector.value;
+  estacionesContainer.innerHTML = '';
+
+  if (!ccpId) {
+    estacionesContainer.innerHTML = '<p class="text-muted text-center">Seleccione un CCP para visualizar sus estaciones policiales.</p>';
+    return;
+  }
+
+  const { data, error } = await supabase
+    .from('estaciones')
+    .select('nombre')
+    .eq('ccp_id', ccpId)
+    .order('nombre', { ascending: true });
+
+  if (error) {
+    console.error('Error al cargar estaciones:', error);
+    estacionesContainer.innerHTML = '<p class="text-danger text-center">Error al cargar estaciones.</p>';
+    return;
+  }
+
+  if (data.length === 0) {
+    estacionesContainer.innerHTML = '<p class="text-muted text-center">Este CCP no tiene estaciones registradas.</p>';
+    return;
+  }
+
+  const list = document.createElement('ul');
+  list.className = 'list-group';
+  data.forEach(est => {
+    const item = document.createElement('li');
+    item.className = 'list-group-item';
+    item.textContent = est.nombre;
+    list.appendChild(item);
+  });
+  estacionesContainer.appendChild(list);
+});
+
+// ▶️ Iniciar
+document.addEventListener('DOMContentLoaded', () => {
+  cargarCCPs();
 });
