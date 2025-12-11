@@ -1,371 +1,83 @@
-// Datos de los CCPs y sus estaciones (estructurados como objetos)
-const ccpData = {
-  metropolitano: {
-    nombre: "CCP METROPOLITANO",
-    estaciones: [
-      { nombre: "Estación Policial Municipal Maracaibo", lat: 10.6477, lng: -71.6353 },
-      { nombre: "Estación Policial Municipal San Francisco", lat: 10.6777, lng: -71.5733 },
-      { nombre: "Estación Policial Municipal Jesús Enrique Lossada", lat: 10.6292, lng: -71.6147 },
-      { nombre: "Estación Policial Municipal La Cañada de Urdaneta", lat: 10.6485, lng: -71.6512 },
-      // ... puedes agregar todas las estaciones con sus coordenadas reales
-      // Por ahora, usamos coordenadas aproximadas de Maracaibo
-      { nombre: "Estación Policial Parroquial Antonio Borjas Romero", lat: 10.6461, lng: -71.6278 },
-      { nombre: "Estación Policial Parroquial Bolívar", lat: 10.6445, lng: -71.6311 },
-      { nombre: "Estación Policial Parroquial Cacique Mara", lat: 10.6490, lng: -71.6400 },
-      { nombre: "Estación Policial Parroquial Caracciolo Parra Peréz", lat: 10.6510, lng: -71.6380 },
-      { nombre: "Estación Policial Parroquial Cecilio Acosta", lat: 10.6520, lng: -71.6360 },
-      { nombre: "Estación Policial Parroquial Cristo de Aranza", lat: 10.6530, lng: -71.6340 },
-      { nombre: "Estación Policial Parroquial Coquivacoa", lat: 10.6540, lng: -71.6320 },
-      { nombre: "Estación Policial Parroquial Chiquinquirá", lat: 10.6550, lng: -71.6300 },
-      { nombre: "Estación Policial Parroquial Francisco Eugenio Bustamante", lat: 10.6560, lng: -71.6280 },
-      { nombre: "Estación Policial Parroquial Idelfonzo Vásquez", lat: 10.6570, lng: -71.6260 },
-      { nombre: "Estación Policial Parroquial Juana de Ávila", lat: 10.6580, lng: -71.6240 },
-      { nombre: "Estación Policial Parroquial Luis Hurtado", lat: 10.6590, lng: -71.6220 },
-      { nombre: "Estación Policial Parroquial Manuel Dagnino", lat: 10.6600, lng: -71.6200 },
-      { nombre: "Estación Policial Parroquial Olegario Villalobos", lat: 10.6610, lng: -71.6180 },
-      { nombre: "Estación Policial Parroquial Raúl Leoni", lat: 10.6620, lng: -71.6160 },
-      { nombre: "Estación Policial Parroquial Santa Lucía", lat: 10.6630, lng: -71.6140 },
-      { nombre: "Estación Policial Parroquial San Isidro", lat: 10.6640, lng: -71.6120 },
-      { nombre: "Estación Policial Parroquial Venancio Pulgar", lat: 10.6650, lng: -71.6100 },
-      { nombre: "Estación Policial Parroquial San Francisco", lat: 10.6660, lng: -71.6080 },
-      { nombre: "Estación Policial Parroquial El Bajo", lat: 10.6670, lng: -71.6060 },
-      { nombre: "Estación Policial Parroquial Domitila Flores", lat: 10.6680, lng: -71.6040 },
-      { nombre: "Estación Policial Parroquial Francisco Ochoa", lat: 10.6690, lng: -71.6020 },
-      { nombre: "Estación Policial Parroquial Los Cortijos", lat: 10.6700, lng: -71.6000 },
-      { nombre: "Estación Policial Parroquial Marcial Hernandez", lat: 10.6710, lng: -71.5980 },
-      { nombre: "Estación Policial Parroquial José Domingo Rus", lat: 10.6720, lng: -71.5960 },
-      { nombre: "Estación Policial Parroquial La Concepción", lat: 10.6730, lng: -71.5940 },
-      { nombre: "Estación Policial Parroquial San José", lat: 10.6740, lng: -71.5920 },
-      { nombre: "Estación Policial Parroquial Mariano Parra Léon", lat: 10.6750, lng: -71.5900 },
-      { nombre: "Estación Policial Parroquial José Ramón Yepez", lat: 10.6760, lng: -71.5880 },
-      { nombre: "Estación Policial Parroquial Andrés Bello", lat: 10.6770, lng: -71.5860 },
-      { nombre: "Estación Policial Parroquial Chiquinquirá", lat: 10.6780, lng: -71.5840 },
-      { nombre: "Estación Policial Parroquial El Carmelo", lat: 10.6790, lng: -71.5820 },
-      { nombre: "Estación Policial Parroquial Potreritos", lat: 10.6800, lng: -71.5800 }
-    ]
-  },
-  costa_oriental: {
-    nombre: "CCP COSTA ORIENTAL DEL LAGO",
-    estaciones: [
-      { nombre: "Estación Policial Municipal Miranda", lat: 10.4500, lng: -71.4000 },
-      { nombre: "Estación Policial Municipal Santa Rita", lat: 10.4600, lng: -71.4100 },
-      { nombre: "Estación Policial Municipal Cabimas", lat: 10.4700, lng: -71.4200 },
-      { nombre: "Estación Policial Municipal Simón Bolívar", lat: 10.4800, lng: -71.4300 },
-      { nombre: "Estación Policial Municipal Lagunillas", lat: 10.4900, lng: -71.4400 },
-      { nombre: "Estación Policial Municipal Valmore Rodríguez", lat: 10.5000, lng: -71.4500 },
-      { nombre: "Estación Policial Municipal Baralt", lat: 10.5100, lng: -71.4600 },
-      { nombre: "Estación Policial Parroquial Altagracia", lat: 10.5200, lng: -71.4700 },
-      { nombre: "Estación Policial Parroquial Faría", lat: 10.5300, lng: -71.4800 },
-      { nombre: "Estación Policial Parroquial Ana María Campos", lat: 10.5400, lng: -71.4900 },
-      { nombre: "Estación Policial Parroquial San Antonio", lat: 10.5500, lng: -71.5000 },
-      { nombre: "Estación Policial Parroquial San José", lat: 10.5600, lng: -71.5100 },
-      { nombre: "Estación Policial Parroquial Santa Rita", lat: 10.5700, lng: -71.5200 },
-      { nombre: "Estación Policial Parroquial El Mene", lat: 10.5800, lng: -71.5300 },
-      { nombre: "Estación Policial Parroquial Pedro Lucas Urribarrí", lat: 10.5900, lng: -71.5400 },
-      { nombre: "Estación Policial Parroquial José Cenobio Urribarrí", lat: 10.6000, lng: -71.5500 },
-      { nombre: "Estación Policial Parroquial Ambrosio", lat: 10.6100, lng: -71.5600 },
-      { nombre: "Estación Policial Parroquial Carmen Herrera", lat: 10.6200, lng: -71.5700 },
-      { nombre: "Estación Policial Parroquial La Rosa", lat: 10.6300, lng: -71.5800 },
-      { nombre: "Estación Policial Parroquial Germán Ríos Linares", lat: 10.6400, lng: -71.5900 },
-      { nombre: "Estación Policial Parroquial San Benito", lat: 10.6500, lng: -71.6000 },
-      { nombre: "Estación Policial Parroquial Rómulo Betancourt", lat: 10.6600, lng: -71.6100 },
-      { nombre: "Estación Policial Parroquial Jorge Hernández", lat: 10.6700, lng: -71.6200 },
-      { nombre: "Estación Policial Parroquial Punta Gorda", lat: 10.6800, lng: -71.6300 },
-      { nombre: "Estación Policial Parroquial Arístides Calvani", lat: 10.6900, lng: -71.6400 },
-      { nombre: "Estación Policial Parroquial Rafael Maria Baralt", lat: 10.7000, lng: -71.6500 },
-      { nombre: "Estación Policial Parroquial Manuel Manrique", lat: 10.7100, lng: -71.6600 },
-      { nombre: "Estación Policial Parroquial Rafael Urdaneta", lat: 10.7200, lng: -71.6700 },
-      { nombre: "Estación Policial Parroquial Libertad", lat: 10.7300, lng: -71.6800 },
-      { nombre: "Estación Policial Parroquial Alonso de Ojeda", lat: 10.7400, lng: -71.6900 },
-      { nombre: "Estación Policial Parroquial Venezuela", lat: 10.7500, lng: -71.7000 },
-      { nombre: "Estación Policial Parroquial Eleazar López Contreras", lat: 10.7600, lng: -71.7100 },
-      { nombre: "Estación Policial Parroquial Campo Lara", lat: 10.7700, lng: -71.7200 },
-      { nombre: "Estación Policial Parroquial Rafael Urdaneta", lat: 10.7800, lng: -71.7300 },
-      { nombre: "Estación Policial Parroquial La Victoria", lat: 10.7900, lng: -71.7400 },
-      { nombre: "Estación Policial Parroquial Raúl Cuenca", lat: 10.8000, lng: -71.7500 },
-      { nombre: "Estación Policial Parroquial San Timoteo", lat: 10.8100, lng: -71.7600 },
-      { nombre: "Estación Policial Parroquial General Urdaneta", lat: 10.8200, lng: -71.7700 },
-      { nombre: "Estación Policial Parroquial Libertador", lat: 10.8300, lng: -71.7800 },
-      { nombre: "Estación Policial Parroquial Marcelino Briceño", lat: 10.8400, lng: -71.7900 },
-      { nombre: "Estación Policial Parroquial Pueblo Nuevo", lat: 10.8500, lng: -71.8000 },
-      { nombre: "Estación Policial Parroquial Manuel Guanipa Matos", lat: 10.8600, lng: -71.8100 }
-    ]
-  },
-  sur_del_lago: {
-    nombre: "CCP SUR DEL LAGO",
-    estaciones: [
-      { nombre: "Estación Policial Municipal Sucre", lat: 9.5000, lng: -71.2000 },
-      { nombre: "Estación Policial Municipal San Francisco Javier Pulgar", lat: 9.5100, lng: -71.2100 },
-      { nombre: "Estación Policial Municipal Colón", lat: 9.5200, lng: -71.2200 },
-      { nombre: "Estación Policial Municipal Catatumbo", lat: 9.5300, lng: -71.2300 },
-      { nombre: "Estación Policial Municipal Jesús María Semprún", lat: 9.5400, lng: -71.2400 },
-      { nombre: "Estación Policial Municipal Machiques Perijá", lat: 9.5500, lng: -71.2500 },
-      { nombre: "Estación Policial Municipal Rosario De Perijá", lat: 9.5600, lng: -71.2600 },
-      { nombre: "Estación Policial Parroquial Bobures", lat: 9.5700, lng: -71.2700 },
-      { nombre: "Estación Policial Parroquial Gibraltar", lat: 9.5800, lng: -71.2800 },
-      { nombre: "Estación Policial Parroquial Heras", lat: 9.5900, lng: -71.2900 },
-      { nombre: "Estación Policial Parroquial Monseñor Arturo Álvarez", lat: 9.6000, lng: -71.3000 },
-      { nombre: "Estación Policial Parroquial Rómulo Gallegos", lat: 9.6100, lng: -71.3100 },
-      { nombre: "Estación Policial Parroquial El Barey", lat: 9.6200, lng: -71.3200 },
-      { nombre: "Estación Policial Parroquial Agustín Codazzi", lat: 9.6300, lng: -71.3300 },
-      { nombre: "Estación Policial Parroquial Carlos Quevedo", lat: 9.6400, lng: -71.3400 },
-      { nombre: "Estación Policial Parroquial Francisco Javier Pulgar", lat: 9.6500, lng: -71.3500 },
-      { nombre: "Estación Policial Parroquial Simón Rodriguez", lat: 9.6600, lng: -71.3600 },
-      { nombre: "Estación Policial Parroquial Moralito", lat: 9.6700, lng: -71.3700 },
-      { nombre: "Estación Policial Parroquial San Carlos del Zulia", lat: 9.6800, lng: -71.3800 },
-      { nombre: "Estación Policial Parroquial Santa Cruz", lat: 9.6900, lng: -71.3900 },
-      { nombre: "Estación Policial Parroquial Santa Bárbara", lat: 9.7000, lng: -71.4000 },
-      { nombre: "Estación Policial Parroquial Urribarrí", lat: 9.7100, lng: -71.4100 },
-      { nombre: "Estación Policial Parroquial Encontrados", lat: 9.7200, lng: -71.4200 },
-      { nombre: "Estación Policial Parroquial Udón Peréz", lat: 9.7300, lng: -71.4300 },
-      { nombre: "Estación Policial Parroquial Jesús María Semprún", lat: 9.7400, lng: -71.4400 },
-      { nombre: "Estación Policial Parroquial Barí", lat: 9.7500, lng: -71.4500 },
-      { nombre: "Estación Policial Parroquial Bartolomé de las Casas", lat: 9.7600, lng: -71.4600 },
-      { nombre: "Estación Policial Parroquial Libertad", lat: 9.7700, lng: -71.4700 },
-      { nombre: "Estación Policial Parroquial Río Negro", lat: 9.7800, lng: -71.4800 },
-      { nombre: "Estación Policial Parroquial San José de Perijá", lat: 9.7900, lng: -71.4900 },
-      { nombre: "Estación Policial Parroquial Donaldo García", lat: 9.8000, lng: -71.5000 },
-      { nombre: "Estación Policial Parroquial El Rosario", lat: 9.8100, lng: -71.5100 },
-      { nombre: "Estación Policial Parroquial Sixto Zambrano", lat: 9.8200, lng: -71.5200 }
-    ]
-  },
-  guajira: {
-    nombre: "CCP GUAJIRA",
-    estaciones: [
-      { nombre: "Estación Policial Municipal Guajira", lat: 10.8000, lng: -71.0000 },
-      { nombre: "Estación Policial Municipal Mara", lat: 10.8100, lng: -71.0100 },
-      { nombre: "Estación Policial Municipal Almirante Padilla", lat: 10.8200, lng: -71.0200 },
-      { nombre: "Estación Policial Parroquial Sinamaica", lat: 10.8300, lng: -71.0300 },
-      { nombre: "Estación Policial Parroquial Alta Guajira", lat: 10.8400, lng: -71.0400 },
-      { nombre: "Estación Policial Parroquial Elías Sánchez Rubio", lat: 10.8500, lng: -71.0500 },
-      { nombre: "Estación Policial Parroquial Guajira", lat: 10.8600, lng: -71.0600 },
-      { nombre: "Estación Policial Parroquial San Rafael de El Moján", lat: 10.8700, lng: -71.0700 },
-      { nombre: "Estación Policial Parroquial La Sierrita", lat: 10.8800, lng: -71.0800 },
-      { nombre: "Estación Policial Parroquial Las Parcelas", lat: 10.8900, lng: -71.0900 },
-      { nombre: "Estación Policial Parroquial Luis de Vicente", lat: 10.9000, lng: -71.1000 },
-      { nombre: "Estación Policial Parroquial Monseñor Marcos Sergio Godoy", lat: 10.9100, lng: -71.1100 },
-      { nombre: "Estación Policial Parroquial Ricaurte", lat: 10.9200, lng: -71.1200 },
-      { nombre: "Estación Policial Parroquial Tamare", lat: 10.9300, lng: -71.1300 },
-      { nombre: "Estación Policial Parroquial Islas de Toas", lat: 10.9400, lng: -71.1400 },
-      { nombre: "Estación Policial Parroquial Monagas", lat: 10.9500, lng: -71.1500 },
-      { nombre: "Estación Policial Parroquial San Fernando", lat: 10.9600, lng: -71.1600 }
-    ]
-  },
-  lara: {
-    nombre: "CCPE LARA",
-    estaciones: [
-      { nombre: "Estación Policial Municipal Iribarren", lat: 10.0000, lng: -69.5000 },
-      { nombre: "Estación Policial Municipal Crespo", lat: 10.0100, lng: -69.5100 },
-      { nombre: "Estación Policial Municipal Urdaneta", lat: 10.0200, lng: -69.5200 },
-      { nombre: "Estación Policial Municipal Jiménez", lat: 10.0300, lng: -69.5300 },
-      { nombre: "Estación Policial Municipal Morán", lat: 10.0400, lng: -69.5400 },
-      { nombre: "Estación Policial Municipal Palavecino", lat: 10.0500, lng: -69.5500 },
-      { nombre: "Estación Policial Municipal Simon Planas", lat: 10.0600, lng: -69.5600 },
-      { nombre: "Estación Policial Municipal Torres", lat: 10.0700, lng: -69.5700 },
-      { nombre: "Estación Policial Municipal Andres Eloy Blanco", lat: 10.0800, lng: -69.5800 },
-      { nombre: "Estación Policial Parroquial Aguedo Felipe Alvarado", lat: 10.0900, lng: -69.5900 },
-      { nombre: "Estación Policial Parroquial Buena Vista", lat: 10.1000, lng: -69.6000 },
-      { nombre: "Estación Policial Parroquial Catedral", lat: 10.1100, lng: -69.6100 },
-      { nombre: "Estación Policial Parroquial Concepción", lat: 10.1200, lng: -69.6200 },
-      { nombre: "Estación Policial Parroquial Unión", lat: 10.1300, lng: -69.6300 },
-      { nombre: "Estación Policial Parroquial Santa Rosa", lat: 10.1400, lng: -69.6400 },
-      { nombre: "Estación Policial Parroquial El Cují", lat: 10.1500, lng: -69.6500 },
-      { nombre: "Estación Policial Parroquial Juárez", lat: 10.1600, lng: -69.6600 },
-      { nombre: "Estación Policial Parroquial Ana Soto (antiguo Juan de Villegas)", lat: 10.1700, lng: -69.6700 },
-      { nombre: "Estación Policial Parroquial Tamaca", lat: 10.1800, lng: -69.6800 },
-      { nombre: "Estación Policial Parroquial Freitez", lat: 10.1900, lng: -69.6900 },
-      { nombre: "Estación Policial Parroquial José María Blanco", lat: 10.2000, lng: -69.7000 },
-      { nombre: "Estación Policial Parroquial Xaguas", lat: 10.2100, lng: -69.7100 },
-      { nombre: "Estación Policial Parroquial Siquisique", lat: 10.2200, lng: -69.7200 },
-      { nombre: "Estación Policial Parroquial San Miguel", lat: 10.2300, lng: -69.7300 },
-      { nombre: "Estación Policial Parroquial Morotuco", lat: 10.2400, lng: -69.7400 },
-      { nombre: "Estación Policial Parroquial Juan Bautista Rodríguez", lat: 10.2500, lng: -69.7500 },
-      { nombre: "Estación Policial Parroquial Cuara", lat: 10.2600, lng: -69.7600 },
-      { nombre: "Estación Policial Parroquial Diego de Lozada", lat: 10.2700, lng: -69.7700 },
-      { nombre: "Estación Policial Parroquial Paraíso de San José", lat: 10.2800, lng: -69.7800 },
-      { nombre: "Estación Policial Parroquial Tintorero", lat: 10.2900, lng: -69.7900 },
-      { nombre: "Estación Policial Parroquial José Bernardo Dorante", lat: 10.3000, lng: -69.8000 },
-      { nombre: "Estación Policial Parroquial Coronel Mariano Pereza", lat: 10.3100, lng: -69.8100 },
-      { nombre: "Estación Policial Parroquial Anzoátegui", lat: 10.3200, lng: -69.8200 },
-      { nombre: "Estación Policial Parroquial Guárico", lat: 10.3300, lng: -69.8300 },
-      { nombre: "Estación Policial Parroquial Hilaro Luna y Luna", lat: 10.3400, lng: -69.8400 },
-      { nombre: "Estación Policial Parroquial Humocaro Alto", lat: 10.3500, lng: -69.8500 },
-      { nombre: "Estación Policial Parroquial Bolívar", lat: 10.3600, lng: -69.8600 },
-      { nombre: "Estación Policial Parroquial Humocaro Bajo", lat: 10.3700, lng: -69.8700 },
-      { nombre: "Estación Policial Parroquial La Candelaria", lat: 10.3800, lng: -69.8800 },
-      { nombre: "Estación Policial Parroquial Morán", lat: 10.3900, lng: -69.8900 },
-      { nombre: "Estación Policial Parroquial Cabudare", lat: 10.4000, lng: -69.9000 },
-      { nombre: "Estación Policial Parroquial Agua Viva", lat: 10.4100, lng: -69.9100 },
-      { nombre: "Estación Policial Parroquial José Gregorio Bastidas", lat: 10.4200, lng: -69.9200 },
-      { nombre: "Estación Policial Parroquial Buría", lat: 10.4300, lng: -69.9300 },
-      { nombre: "Estación Policial Parroquial Gustavo Vega león", lat: 10.4400, lng: -69.9400 },
-      { nombre: "Estación Policial Parroquial Sarare", lat: 10.4500, lng: -69.9500 },
-      { nombre: "Estación Policial Parroquial Altagracia", lat: 10.4600, lng: -69.9600 },
-      { nombre: "Estación Policial Parroquial Antonio Díaz", lat: 10.4700, lng: -69.9700 },
-      { nombre: "Estación Policial Parroquial Las Mercedes", lat: 10.4800, lng: -69.9800 },
-      { nombre: "Estación Policial Parroquial Montaña Verde", lat: 10.4900, lng: -69.9900 },
-      { nombre: "Estación Policial Parroquial Cecilio Zubillaga", lat: 10.5000, lng: -70.0000 },
-      { nombre: "Estación Policial Parroquial Camacaro", lat: 10.5100, lng: -70.0100 },
-      { nombre: "Estación Policial Parroquial Castañeda", lat: 10.5200, lng: -70.0200 },
-      { nombre: "Estación Policial Parroquial Chiquinquira", lat: 10.5300, lng: -70.0300 },
-      { nombre: "Estación Policial Parroquial El Banco", lat: 10.5400, lng: -70.0400 },
-      { nombre: "Estación Policial Parroquial Espinoza de los Montes", lat: 10.5500, lng: -70.0500 },
-      { nombre: "Estación Policial Parroquial Heriberto Arrollo", lat: 10.5600, lng: -70.0600 },
-      { nombre: "Estación Policial Parroquial Lara", lat: 10.5700, lng: -70.0700 },
-      { nombre: "Estación Policial Parroquial Manuel Morillo", lat: 10.5800, lng: -70.0800 },
-      { nombre: "Estación Policial Parroquial Montes de Oca", lat: 10.5900, lng: -70.0900 },
-      { nombre: "Estación Policial Parroquial Reyes de Vargas", lat: 10.6000, lng: -70.1000 },
-      { nombre: "Estación Policial Parroquial Torres", lat: 10.6100, lng: -70.1100 },
-      { nombre: "Estación Policial Parroquial Trinidad Samuel", lat: 10.6200, lng: -70.1200 },
-      { nombre: "Estación Policial Parroquial Quebrada Honda de Guache", lat: 10.6300, lng: -70.1300 },
-      { nombre: "Estación Policial Parroquial Pio Tamayo", lat: 10.6400, lng: -70.1400 },
-      { nombre: "Estación Policial Parroquial Yacambú", lat: 10.6500, lng: -70.1500 }
-    ]
-  },
-  falcon: {
-    nombre: "CCPE FALCÓN",
-    estaciones: [
-      { nombre: "Estación Policial Municipal Moseñor Iturriza", lat: 11.0000, lng: -69.0000 },
-      { nombre: "Estación Policial Municipal Federacion", lat: 11.0100, lng: -69.0100 },
-      { nombre: "Estación Policial Municipal Miranda", lat: 11.0200, lng: -69.0200 },
-      { nombre: "Estación Policial Municipal Dabajuro", lat: 11.0300, lng: -69.0300 },
-      { nombre: "Estación Policial Municipal Colina", lat: 11.0400, lng: -69.0400 },
-      { nombre: "Estación Policial Municipal Jacura", lat: 11.0500, lng: -69.0500 },
-      { nombre: "Estación Policial Municipal Mauroa", lat: 11.0600, lng: -69.0600 },
-      { nombre: "Estación Policial Municipal José Laurencio Silva", lat: 11.0700, lng: -69.0700 },
-      { nombre: "Estación Policial Municipal Falcón", lat: 11.0800, lng: -69.0800 },
-      { nombre: "Estación Policial Municipal Carirubana", lat: 11.0900, lng: -69.0900 },
-      { nombre: "Estación Policial Municipal Casique Manaure", lat: 11.1000, lng: -69.1000 },
-      { nombre: "Estación Policial Municipal Zamora", lat: 11.1100, lng: -69.1100 },
-      { nombre: "Estación Policial Municipal Acosta", lat: 11.1200, lng: -69.1200 },
-      { nombre: "Estación Policial Municipal Buchivacoa", lat: 11.1300, lng: -69.1300 },
-      { nombre: "Estación Policial Municipal Democracia", lat: 11.1400, lng: -69.1400 },
-      { nombre: "Estación Policial Municipal Los Taques", lat: 11.1500, lng: -69.1500 },
-      { nombre: "Estación Policial Municipal Palmasola", lat: 11.1600, lng: -69.1600 },
-      { nombre: "Estación Policial Municipal Petit", lat: 11.1700, lng: -69.1700 },
-      { nombre: "Estación Policial Municipal Píritu", lat: 11.1800, lng: -69.1800 },
-      { nombre: "Estación Policial Municipal San Francisco", lat: 11.1900, lng: -69.1900 },
-      { nombre: "Estación Policial Municipal Sucre", lat: 11.2000, lng: -69.2000 },
-      { nombre: "Estación Policial Municipal Tocópero", lat: 11.2100, lng: -69.2100 },
-      { nombre: "Estación Policial Municipal Unión", lat: 11.2200, lng: -69.2200 },
-      { nombre: "Estación Policial Municipal Urumaco", lat: 11.2300, lng: -69.2300 },
-      { nombre: "Estación Policial Municipal Bolivar", lat: 11.2400, lng: -69.2400 },
-      { nombre: "Estación Policial Parroquial Boca del Tocuyo", lat: 11.2500, lng: -69.2500 },
-      { nombre: "Estación Policial Parroquial Chichiriviche", lat: 11.2600, lng: -69.2600 },
-      { nombre: "Estación Policial Parroquial Tocuyo de la Costa", lat: 11.2700, lng: -69.2700 },
-      { nombre: "Estación Policial Parroquial Agua Larga", lat: 11.2800, lng: -69.2800 },
-      { nombre: "Estación Policial Parroquial Churuguara", lat: 11.2900, lng: -69.2900 },
-      { nombre: "Estación Policial Parroquial El Paují", lat: 11.3000, lng: -69.3000 },
-      { nombre: "Estación Policial Parroquial Independencia", lat: 11.3100, lng: -69.3100 },
-      { nombre: "Estación Policial Parroquial Mapararí", lat: 11.3200, lng: -69.3200 },
-      { nombre: "Estación Policial Parroquial Guzmán Guillermo", lat: 11.3300, lng: -69.3300 },
-      { nombre: "Estación Policial Parroquial Mitare", lat: 11.3400, lng: -69.3400 },
-      { nombre: "Estación Policial Parroquial Rio Seco", lat: 11.3500, lng: -69.3500 },
-      { nombre: "Estación Policial Parroquial Sabaneta", lat: 11.3600, lng: -69.3600 },
-      { nombre: "Estación Policial Parroquial San Antonio", lat: 11.3700, lng: -69.3700 },
-      { nombre: "Estación Policial Parroquial San Gabriel", lat: 11.3800, lng: -69.3800 },
-      { nombre: "Estación Policial Parroquial Santa Ana", lat: 11.3900, lng: -69.3900 },
-      { nombre: "Estación Policial Parroquial Dabajuro", lat: 11.4000, lng: -69.4000 },
-      { nombre: "Estación Policial Parroquial La Vela de Coro", lat: 11.4100, lng: -69.4100 },
-      { nombre: "Estación Policial Parroquial Acurigua", lat: 11.4200, lng: -69.4200 },
-      { nombre: "Estación Policial Parroquial Guaibacoa", lat: 11.4300, lng: -69.4300 },
-      { nombre: "Estación Policial Parroquial Las Calderas", lat: 11.4400, lng: -69.4400 },
-      { nombre: "Estación Policial Parroquial Macoruca", lat: 11.4500, lng: -69.4500 },
-      { nombre: "Estación Policial Parroquial Agua Linda", lat: 11.4600, lng: -69.4600 },
-      { nombre: "Estación Policial Parroquial Araurima", lat: 11.4700, lng: -69.4700 },
-      { nombre: "Estación Policial Parroquial Jacura", lat: 11.4800, lng: -69.4800 },
-      { nombre: "Estación Policial Parroquial Mena Mauroa", lat: 11.4900, lng: -69.4900 },
-      { nombre: "Estación Policial Parroquial San Felix", lat: 11.5000, lng: -69.5000 },
-      { nombre: "Estación Policial Parroquial Casigua", lat: 11.5100, lng: -69.5100 },
-      { nombre: "Estación Policial Parroquial Tucacas", lat: 11.5200, lng: -69.5200 },
-      { nombre: "Estación Policial Parroquial Boca de Aroa", lat: 11.5300, lng: -69.5300 },
-      { nombre: "Estación Policial Parroquial Aduare", lat: 11.5400, lng: -69.5400 },
-      { nombre: "Estación Policial Parroquial Adicora", lat: 11.5500, lng: -69.5500 },
-      { nombre: "Estación Policial Parroquial Baraived", lat: 11.5600, lng: -69.5600 },
-      { nombre: "Estación Policial Parroquial Buena Vista", lat: 11.5700, lng: -69.5700 },
-      { nombre: "Estación Policial Parroquial Jadacaquiva", lat: 11.5800, lng: -69.5800 },
-      { nombre: "Estación Policial Parroquial El Vinculo", lat: 11.5900, lng: -69.5900 },
-      { nombre: "Estación Policial Parroquial El Hato", lat: 11.6000, lng: -69.6000 },
-      { nombre: "Estación Policial Parroquial Moruy", lat: 11.6100, lng: -69.6100 },
-      { nombre: "Estación Policial Parroquial Pueblo Nuevo", lat: 11.6200, lng: -69.6200 },
-      { nombre: "Estación Policial Parroquial Norte", lat: 11.6300, lng: -69.6300 },
-      { nombre: "Estación Policial Parroquial Carirubana", lat: 11.6400, lng: -69.6400 },
-      { nombre: "Estación Policial Parroquial Santa Ana", lat: 11.6500, lng: -69.6500 },
-      { nombre: "Estación Policial Parroquial Urbana Punta Cardón", lat: 11.6600, lng: -69.6600 },
-      { nombre: "Estación Policial Parroquial Casique Manaure", lat: 11.6700, lng: -69.6700 },
-      { nombre: "Estación Policial Parroquial Puerto Cumarebo", lat: 11.6800, lng: -69.6800 },
-      { nombre: "Estación Policial Parroquial La Ciénaga", lat: 11.6900, lng: -69.6900 },
-      { nombre: "Estación Policial Parroquial La Soledad", lat: 11.7000, lng: -69.7000 },
-      { nombre: "Estación Policial Parroquial Pueblo Cumarebo", lat: 11.7100, lng: -69.7100 },
-      { nombre: "Estación Policial Parroquial zazárida", lat: 11.7200, lng: -69.7200 },
-      { nombre: "Estación Policial Parroquial Capadare", lat: 11.7300, lng: -69.7300 },
-      { nombre: "Estación Policial Parroquial La Pastora", lat: 11.7400, lng: -69.7400 },
-      { nombre: "Estación Policial Parroquial Libertador", lat: 11.7500, lng: -69.7500 },
-      { nombre: "Estación Policial Parroquial San Juan de los Cayos", lat: 11.7600, lng: -69.7600 },
-      { nombre: "Estación Policial Parroquial Bariro", lat: 11.7700, lng: -69.7700 },
-      { nombre: "Estación Policial Parroquial Borojó", lat: 11.7800, lng: -69.7800 },
-      { nombre: "Estación Policial Parroquial Capatárida", lat: 11.7900, lng: -69.7900 },
-      { nombre: "Estación Policial Parroquial Guajiro", lat: 11.8000, lng: -69.8000 },
-      { nombre: "Estación Policial Parroquial Seque", lat: 11.8100, lng: -69.8100 },
-      { nombre: "Estación Policial Parroquial Valle de Eroa", lat: 11.8200, lng: -69.8200 },
-      { nombre: "Estación Policial Parroquial Zarárida", lat: 11.8300, lng: -69.8300 },
-      { nombre: "Estación Policial Parroquial Agua Clara", lat: 11.8400, lng: -69.8400 },
-      { nombre: "Estación Policial Parroquial Avaria", lat: 11.8500, lng: -69.8500 },
-      { nombre: "Estación Policial Parroquial Pedregal", lat: 11.8600, lng: -69.8600 },
-      { nombre: "Estación Policial Parroquial Piedra Grande", lat: 11.8700, lng: -69.8700 },
-      { nombre: "Estación Policial Parroquial Purureche", lat: 11.8800, lng: -69.8800 },
-      { nombre: "Estación Policial Parroquial Los Taques", lat: 11.8900, lng: -69.8900 },
-      { nombre: "Estación Policial Parroquial Judibana", lat: 11.9000, lng: -69.9000 },
-      { nombre: "Estación Policial Parroquial Palma Sola", lat: 11.9100, lng: -69.9100 },
-      { nombre: "Estación Policial Parroquial Cabure", lat: 11.9200, lng: -69.9200 },
-      { nombre: "Estación Policial Parroquial Colina", lat: 11.9300, lng: -69.9300 },
-      { nombre: "Estación Policial Parroquial Curimagua", lat: 11.9400, lng: -69.9400 },
-      { nombre: "Estación Policial Parroquial San José de la Costa", lat: 11.9500, lng: -69.9500 },
-      { nombre: "Estación Policial Parroquial Píritu", lat: 11.9600, lng: -69.9600 },
-      { nombre: "Estación Policial Parroquial San Francisco de Mirimire", lat: 11.9700, lng: -69.9700 },
-      { nombre: "Estación Policial Parroquial Sucre", lat: 11.9800, lng: -69.9800 },
-      { nombre: "Estación Policial Parroquial Pecaya", lat: 11.9900, lng: -69.9900 },
-      { nombre: "Estación Policial Parroquial Tocópero", lat: 12.0000, lng: -70.0000 },
-      { nombre: "Estación Policial Parroquial Charal", lat: 12.0100, lng: -70.0100 },
-      { nombre: "Estación Policial Parroquial Las Vegas del Tuy", lat: 12.0200, lng: -70.0200 },
-      { nombre: "Estación Policial Parroquial Santa Cruz de Bucaral", lat: 12.0300, lng: -70.0300 },
-      { nombre: "Estación Policial Parroquial Bruzual", lat: 12.0400, lng: -70.0400 },
-      { nombre: "Estación Policial Parroquial Urumaco", lat: 12.0500, lng: -70.0500 },
-      { nombre: "Estación Policial Parroquial Aracua", lat: 12.0600, lng: -70.0600 },
-      { nombre: "Estación Policial Parroquial La Peña", lat: 12.0700, lng: -70.0700 },
-      { nombre: "Estación Policial Parroquial San Luis", lat: 12.0800, lng: -70.0800 }
-    ]
-  }
-};
+// 🔑 Credenciales de tu proyecto en Supabase
+const supabaseUrl = 'https://hxkqbszmkxydxxtsvdqb.supabase.co';
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh4a3Fic3pta3h5ZHh4dHN2ZHFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0ODEyMTAsImV4cCI6MjA4MTA1NzIxMH0.Fs504W-L-KqtKcVfLx57BeMomPAMB5NZ_dsrF2YpBw8';
+const supabase = supabase.createClient(supabaseUrl, supabaseAnonKey);
 
-// Función para mostrar las estaciones según el CCP seleccionado
-function mostrarEstaciones() {
-  const ccpId = document.getElementById("ccpSelector").value;
-  const container = document.getElementById("estacionesContainer");
-  
-  if (!ccpId) {
-    container.innerHTML = "<p class='text-muted'>Selecciona un CCP para ver sus estaciones.</p>";
+// Cargar CCPs al iniciar
+document.addEventListener('DOMContentLoaded', async () => {
+  const { data, error } = await supabase
+    .from('ccps')
+    .select('id, nombre, codigo')
+    .order('nombre');
+
+  if (error) {
+    console.error('Error al cargar CCPs:', error);
+    document.getElementById('ccpSelector').innerHTML = '<option>Error al cargar</option>';
     return;
   }
 
-  const ccp = ccpData[ccpId];
-  let html = `<h6 class="mb-3">${ccp.nombre}</h6><div class="estaciones-list">`;
+  const select = document.getElementById('ccpSelector');
+  data.forEach(ccp => {
+    const opt = document.createElement('option');
+    opt.value = ccp.codigo;
+    opt.textContent = ccp.nombre;
+    select.appendChild(opt);
+  });
+});
 
-  ccp.estaciones.forEach(est => {
+// Mostrar estaciones del CCP seleccionado
+async function mostrarEstaciones() {
+  const codigo = document.getElementById('ccpSelector').value;
+  const container = document.getElementById('estacionesContainer');
+
+  if (!codigo) {
+    container.innerHTML = '<p class="text-muted text-center">Seleccione un CCP para visualizar sus estaciones policiales.</p>';
+    return;
+  }
+
+  // Obtener ID del CCP
+  const { data: ccpData, error: ccpErr } = await supabase
+    .from('ccps')
+    .select('id')
+    .eq('codigo', codigo)
+    .single();
+
+  if (ccpErr) {
+    container.innerHTML = '<p class="text-danger">CCP no encontrado.</p>';
+    return;
+  }
+
+  // Obtener estaciones
+  const { data: estaciones, error: estErr } = await supabase
+    .from('estaciones')
+    .select('nombre, lat, lng')
+    .eq('ccp_id', ccpData.id)
+    .order('nombre');
+
+  if (estErr) {
+    container.innerHTML = '<p class="text-danger">Error al cargar estaciones.</p>';
+    return;
+  }
+
+  if (estaciones.length === 0) {
+    container.innerHTML = '<p class="text-muted">No hay estaciones registradas para este CCP.</p>';
+    return;
+  }
+
+  let html = '<h5 class="mb-3 fw-bold">Estaciones Policiales:</h5>';
+  estaciones.forEach(est => {
     html += `
       <div class="estacion-item">
-        <span>${est.nombre}</span>
-        <button class="btn-ir" onclick="abrirMapa(${est.lat}, ${est.lng})">Ir</button>
+        <span class="fw-medium">${est.nombre}</span>
+        <button class="btn-ir" onclick="abrirMapa(${est.lat}, ${est.lng})">Ver en Mapa</button>
       </div>
     `;
   });
-
-  html += "</div>";
   container.innerHTML = html;
 }
 
-// Función para abrir Google Maps con la ubicación
+// Abrir Google Maps
 function abrirMapa(lat, lng) {
-  const url = `https://www.google.com/maps?q=${lat},${lng}&z=15`;
+  const url = `https://www.google.com/maps?q=${lat},${lng}&z=16`;
   window.open(url, '_blank');
 }
