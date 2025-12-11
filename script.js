@@ -1,4 +1,10 @@
 document.addEventListener('DOMContentLoaded', async () => {
+  // Verificar que Supabase se haya cargado
+  if (!window.supabase) {
+    console.error('Supabase no está cargado. Verifica el orden de los scripts.');
+    return;
+  }
+
   const { createClient } = window.supabase;
   const supabase = createClient(
     'https://hxkqbszmkxydxxtsvdqb.supabase.co',
@@ -14,7 +20,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (!select || !container) return;
 
   try {
-    const { data: ccps, error } = await supabase
+    const { data, error } = await supabase
       .from('ccps')
       .select('nombre, codigo')
       .order('nombre', { ascending: true });
@@ -22,7 +28,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (error) throw error;
 
     select.innerHTML = '<option value="">-- Seleccione un CCP --</option>' +
-      ccps.map(ccp => `<option value="${ccp.codigo}">${ccp.nombre}</option>`).join('');
+      data.map(ccp => `<option value="${ccp.codigo}">${ccp.nombre}</option>`).join('');
   } catch (err) {
     console.error('Error al cargar CCPs:', err.message);
     select.innerHTML = '<option>Error de conexión</option>';
@@ -60,17 +66,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
       }
 
-      container.innerHTML = `
-        <h5 class="mb-3 fw-bold">Estaciones Policiales:</h5>
-        ${estaciones.map(est => `
+      let html = '<h5 class="mb-3 fw-bold">Estaciones Policiales:</h5>';
+      estaciones.forEach(est => {
+        html += `
           <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
             <span class="fw-medium">${est.nombre}</span>
             <button class="btn btn-sm btn-outline-primary" onclick="abrirMapa(${est.lat}, ${est.lng})">
               Ver en Mapa
             </button>
           </div>
-        `).join('')}
-      `;
+        `;
+      });
+      container.innerHTML = html;
     } catch (err) {
       console.error('Error al cargar estaciones:', err.message);
       container.innerHTML = '<p class="text-danger">Error al cargar estaciones. Intente nuevamente.</p>';
