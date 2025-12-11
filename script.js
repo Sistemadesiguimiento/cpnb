@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', async () => {
-  // Verificar que Supabase se haya cargado
   if (!window.supabase) {
-    console.error('❌ Supabase no está cargado. Asegúrate de que el script de Supabase esté antes que script.js.');
+    console.error('❌ Supabase no está cargado. Verifica el orden de los scripts.');
     document.getElementById('ccpSelector').innerHTML = '<option>❌ Error: librería no cargada</option>';
     return;
   }
@@ -20,6 +19,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const container = document.getElementById('estacionesContainer');
   if (!select || !container) return;
 
+  // Cargar lista de CCPs
   try {
     const { data, error } = await supabase
       .from('ccps')
@@ -36,6 +36,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
+  // Al seleccionar un CCP
   select.addEventListener('change', async (e) => {
     const codigo = e.target.value;
     if (!codigo) {
@@ -46,7 +47,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     container.innerHTML = '<p class="text-muted">Cargando estaciones...</p>';
 
     try {
-      const { data: ccpData, error: ccpErr } = await supabase
+      const {  ccpData, error: ccpErr } = await supabase
         .from('ccps')
         .select('id')
         .eq('codigo', codigo)
@@ -54,7 +55,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (ccpErr) throw ccpErr;
 
-      const { data: estaciones, error: estErr } = await supabase
+      const {  estaciones, error: estErr } = await supabase
         .from('estaciones')
         .select('nombre, lat, lng')
         .eq('ccp_id', ccpData.id)
@@ -67,7 +68,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
       }
 
-      // Usamos clases de Bootstrap para estética
+      // Render con estilos de Bootstrap
       let html = '<h5 class="mb-3 fw-bold">Estaciones Policiales:</h5>';
       estaciones.forEach(est => {
         html += `
@@ -82,7 +83,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       container.innerHTML = html;
     } catch (err) {
       console.error('Error al cargar estaciones:', err.message);
-      container.innerHTML = '<p class="text-danger">❌ Error al cargar estaciones. Ver consola para detalles.</p>';
+      container.innerHTML = '<p class="text-danger">❌ Error al cargar estaciones.</p>';
     }
   });
 });
