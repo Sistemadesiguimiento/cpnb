@@ -1,0 +1,41 @@
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f8f9fa;
+}
+
+.logo {
+  height: 60px;
+  border-radius: 8px;
+}
+
+.card {
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.estacion-item {
+  padding: 12px;
+  margin-bottom: 8px;
+  background-color: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.estacion-item:hover {
+  background-color: #f1f1f1;
+}
+
+.btn-ir {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+.btn-ir:hover {
+  background-color: #c82333;
+}
