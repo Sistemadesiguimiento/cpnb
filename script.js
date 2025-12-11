@@ -11,32 +11,24 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const select = document.getElementById('ccpSelector');
   const container = document.getElementById('estacionesContainer');
-
   if (!select || !container) return;
 
-  // Cargar lista de CCPs
   try {
-    const { data, error } = await supabase
+    const { data: ccps, error } = await supabase
       .from('ccps')
       .select('nombre, codigo')
       .order('nombre', { ascending: true });
 
     if (error) throw error;
 
-    select.innerHTML = '<option value="">-- Seleccione un CCP --</option>';
-    data.forEach(ccp => {
-      const option = document.createElement('option');
-      option.value = ccp.codigo;
-      option.textContent = ccp.nombre;
-      select.appendChild(option);
-    });
+    select.innerHTML = '<option value="">-- Seleccione un CCP --</option>' +
+      ccps.map(ccp => `<option value="${ccp.codigo}">${ccp.nombre}</option>`).join('');
   } catch (err) {
     console.error('Error al cargar CCPs:', err.message);
     select.innerHTML = '<option>Error de conexión</option>';
     return;
   }
 
-  // Manejar selección de CCP
   select.addEventListener('change', async (e) => {
     const codigo = e.target.value;
     if (!codigo) {
@@ -47,7 +39,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     container.innerHTML = '<p class="text-muted">Cargando estaciones...</p>';
 
     try {
-      // Obtener ID del CCP seleccionado
       const { data: ccpData, error: ccpErr } = await supabase
         .from('ccps')
         .select('id')
@@ -56,7 +47,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (ccpErr) throw ccpErr;
 
-      // Cargar estaciones asociadas
       const { data: estaciones, error: estErr } = await supabase
         .from('estaciones')
         .select('nombre, lat, lng')
@@ -70,22 +60,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
       }
 
-      // Renderizar estaciones
-      const html = estaciones.map(est => `
-        <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
-          <span class="fw-medium">${est.nombre}</span>
-          <button 
-            class="btn btn-sm btn-outline-primary"
-            onclick="abrirMapa(${est.lat}, ${est.lng})"
-          >
-            Ver en Mapa
-          </button>
-        </div>
-      `).join('');
-
       container.innerHTML = `
         <h5 class="mb-3 fw-bold">Estaciones Policiales:</h5>
-        ${html}
+        ${estaciones.map(est => `
+          <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+            <span class="fw-medium">${est.nombre}</span>
+            <button class="btn btn-sm btn-outline-primary" onclick="abrirMapa(${est.lat}, ${est.lng})">
+              Ver en Mapa
+            </button>
+          </div>
+        `).join('')}
       `;
     } catch (err) {
       console.error('Error al cargar estaciones:', err.message);
