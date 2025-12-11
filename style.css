@@ -1,64 +1,88 @@
-/* Ajustes responsivos y estilos generales */
+/* Colores institucionales PNB */
+:root {
+  --pnb-blue: #002147;      /* Azul marino oficial */
+  --pnb-gold: #D4AF37;      /* Dorado institucional */
+  --pnb-light: #f0f4f8;
+}
+
 body {
+  background-color: #f9fbfd;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f8f9fa;
-  padding-bottom: 20px;
+  color: #333;
 }
 
-.logo {
-  height: 50px;
-  border-radius: 6px;
+.bg-pnb-dark {
+  background-color: var(--pnb-blue) !important;
 }
 
-/* Contenedor de estaciones con scroll suave en móviles */
-.estaciones-container {
-  max-height: 60vh;
-  overflow-y: auto;
-  padding: 10px 0;
+.bg-pnb-blue {
+  background-color: #003366 !important; /* Azul ligeramente más claro para contraste */
+}
+
+.btn-pnb-gold {
+  background-color: var(--pnb-gold);
+  color: var(--pnb-blue);
+  font-weight: bold;
+  border: none;
+}
+
+.btn-pnb-gold:hover {
+  background-color: #c19d2e;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.logo-pnb {
+  height: 80px;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.card {
+  border-radius: 12px !important;
 }
 
 .estacion-item {
-  padding: 14px;
-  margin-bottom: 10px;
-  background-color: #fff;
-  border: 1px solid #e9ecef;
+  padding: 16px;
+  margin-bottom: 12px;
+  background-color: white;
+  border-left: 4px solid var(--pnb-blue);
   border-radius: 8px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  transition: transform 0.2s;
 }
 
 .estacion-item:hover {
-  background-color: #f8f9fa;
+  transform: translateX(5px);
+  background-color: #f0f7ff;
 }
 
 .btn-ir {
-  background-color: #dc3545;
+  background-color: var(--pnb-blue);
   color: white;
   border: none;
-  padding: 8px 16px;
-  border-radius: 6px;
+  padding: 8px 20px;
+  border-radius: 30px;
   font-weight: bold;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
 }
 
 .btn-ir:hover {
-  background-color: #c82333;
+  background-color: #001a38;
   color: white;
 }
 
-/* Ajuste para pantallas pequeñas */
+/* Responsive */
 @media (max-width: 576px) {
-  header h1 {
-    font-size: 1.1rem;
+  .logo-pnb {
+    height: 60px;
   }
-  .logo {
-    height: 45px;
-  }
-  .btn-ir {
-    padding: 6px 12px;
-    font-size: 0.85rem;
+  .display-6 {
+    font-size: 1.5rem;
   }
   .estacion-item {
     flex-direction: column;
