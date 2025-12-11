@@ -1,12 +1,20 @@
 document.addEventListener('DOMContentLoaded', async () => {
-  // Inicializar cliente de Supabase (window.supabase ya existe gracias al script global)
+  // Cargar SDK global si no está presente (pero en tu caso, ya lo cargas en HTML)
+  if (typeof window.supabase === 'undefined') {
+    await new Promise((resolve) => {
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.global.min.js';
+      script.onload = resolve;
+      document.head.appendChild(script);
+    });
+  }
+
   const { createClient } = window.supabase;
   const supabase = createClient(
     'https://hxkqbszmkxydxxtsvdqb.supabase.co',
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh4a3Fic3pta3h5ZHh4dHN2ZHFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0ODEyMTAsImV4cCI6MjA4MTA1NzIxMH0.Fs504W-L-KqtKcVfLx57BeMomPAMB5NZ_dsrF2YpBw8'
   );
 
-  // Función global para mapa
   window.abrirMapa = (lat, lng) => {
     window.open(`https://www.google.com/maps?q=${lat},${lng}&z=16`, '_blank');
   };
@@ -15,21 +23,31 @@ document.addEventListener('DOMContentLoaded', async () => {
   const container = document.getElementById('estacionesContainer');
   if (!select || !container) return;
 
-  // Cargar CCPs
+  // ✅ CARGAR CCPs CORRECTAMENTE
   try {
-    const {  ccps, error } = await supabase
+    const { data, error } = await supabase
       .from('ccps')
       .select('nombre, codigo')
-      .order('nombre');
+      .order('nombre', { ascending: true });
 
-    if (error) throw error;
+    if (error) {
+      console.error('Supabase error:', error);
+      select.innerHTML = '<option>Error: ' + error.message + '</option>';
+      return;
+    }
 
+    if (!data || data.length === 0) {
+      select.innerHTML = '<option>No hay CCPs registrados</option>';
+      return;
+    }
+
+    // ✅ Aquí usamos `data`, no `ccps`
     select.innerHTML = '<option value="">-- Seleccione un CCP --</option>' +
-      ccps.map(ccp => `<option value="${ccp.codigo}">${ccp.nombre}</option>`).join('');
+      data.map(ccp => `<option value="${ccp.codigo}">${ccp.nombre}</option>`).join('');
 
   } catch (err) {
-    console.error('Error al cargar CCPs:', err);
-    select.innerHTML = '<option>Error de conexión</option>';
+    console.error('Excepción inesperada:', err);
+    select.innerHTML = '<option>Error inesperado</option>';
   }
 
   // Cargar estaciones al seleccionar
@@ -40,10 +58,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    container.innerHTML = '<p class="text-muted">Cargando...</p>';
+    container.innerHTML = '<p class="text-muted">Cargando estaciones...</p>';
 
     try {
-      const {  ccp, error: ccpErr } = await supabase
+      const { data: ccpData, error: ccpErr } = await supabase
         .from('ccps')
         .select('id')
         .eq('codigo', codigo)
@@ -51,16 +69,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (ccpErr) throw ccpErr;
 
-      const {  estaciones, error: estErr } = await supabase
+      const { data: estaciones, error: estErr } = await supabase
         .from('estaciones')
         .select('nombre, lat, lng')
-        .eq('ccp_id', ccp.id)
-        .order('nombre');
+        .eq('ccp_id', ccpData.id)
+        .order('nombre', { ascending: true });
 
       if (estErr) throw estErr;
 
-      if (estaciones.length === 0) {
-        container.innerHTML = '<p class="text-muted">No hay estaciones registradas.</p>';
+      if (!estaciones || estaciones.length === 0) {
+        container.innerHTML = '<p class="text-muted">No hay estaciones registradas para este CCP.</p>';
         return;
       }
 
@@ -76,7 +94,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     } catch (err) {
       console.error('Error al cargar estaciones:', err);
-      container.innerHTML = '<p class="text-danger">Error al cargar estaciones.</p>';
+      container.innerHTML = '<p class="text-danger">Error: ' + (err.message || 'desconocido') + '</p>';
     }
   });
 });
