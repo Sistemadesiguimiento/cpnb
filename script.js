@@ -1,29 +1,63 @@
-// --- NADA ANTES DE ESTA LÍNEA ---
-// Inicialización segura de Supabase
-const supabase = (() => {
-  const url = 'https://hxkqbszmkxydxxtsvdqb.supabase.co';
-  const key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh4a3Fic3pta3h5ZHh4dHN2ZHFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0ODEyMTAsImV4cCI6MjA4MTA1NzIxMH0.Fs504W-L-KqtKcVfLx57BeMomPAMB5NZ_dsrF2YpBw8';
-  return window.supabase.createClient(url, key);
-})();
+// --- CARGAR SUPABASE CORRECTAMENTE EN NAVEGADOR ---
+document.addEventListener('DOMContentLoaded', async () => {
+  // 1. Cargar dinámicamente el SDK si no está presente
+  if (typeof window.supabase === 'undefined') {
+    await new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+      script.onload = resolve;
+      script.onerror = reject;
+      document.head.appendChild(script);
+    });
+  }
 
-// Función global segura
-function abrirMapa(lat, lng) {
-  window.open(`https://www.google.com/maps?q=${lat},${lng}&z=16`, '_blank');
-}
+  // 2. Inicializar cliente
+  const { createClient } = window.supabase;
+  const supabase = createClient(
+    'https://hxkqbszmkxydxxtsvdqb.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh4a3Fic3pta3h5ZHh4dHN2ZHFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0ODEyMTAsImV4cCI6MjA4MTA1NzIxMH0.Fs504W-L-KqtKcVfLx57BeMomPAMB5NZ_dsrF2YpBw8'
+  );
 
-// Toda la lógica se ejecuta SOLO cuando el DOM está listo
-document.addEventListener('DOMContentLoaded', () => {
+  // 3. Función para abrir mapa
+  window.abrirMapa = (lat, lng) => {
+    window.open(`https://www.google.com/maps?q=${lat},${lng}&z=16`, '_blank');
+  };
+
+  // 4. Obtener elementos
   const select = document.getElementById('ccpSelector');
   const container = document.getElementById('estacionesContainer');
-
   if (!select || !container) return;
 
-  // Función para cargar estaciones
-  const cargarEstaciones = async (codigo) => {
-    container.innerHTML = '<p class="text-muted">Cargando...</p>';
-    
+  // 5. Cargar CCPs
+  try {
+    const {  ccps, error } = await supabase
+      .from('ccps')
+      .select('nombre, codigo')
+      .order('nombre');
+
+    if (error) throw error;
+
+    select.innerHTML = '<option value="">-- Seleccione un CCP --</option>' +
+      ccps.map(ccp => `<option value="${ccp.codigo}">${ccp.nombre}</option>`).join('');
+
+  } catch (err) {
+    console.error('Error al cargar CCPs:', err);
+    select.innerHTML = '<option>Error de conexión</option>';
+    return;
+  }
+
+  // 6. Cargar estaciones al cambiar selección
+  select.addEventListener('change', async (e) => {
+    const codigo = e.target.value;
+    if (!codigo) {
+      container.innerHTML = '<p class="text-muted text-center">Seleccione un CCP para visualizar sus estaciones policiales.</p>';
+      return;
+    }
+
+    container.innerHTML = '<p class="text-muted">Cargando estaciones...</p>';
+
     try {
-      const { data: ccp, error: ccpErr } = await supabase
+      const {  ccp, error: ccpErr } = await supabase
         .from('ccps')
         .select('id')
         .eq('codigo', codigo)
@@ -40,7 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (estErr) throw estErr;
 
       if (estaciones.length === 0) {
-        container.innerHTML = '<p class="text-muted">No hay estaciones registradas.</p>';
+        container.innerHTML = '<p class="text-muted">No hay estaciones registradas para este CCP.</p>';
         return;
       }
 
@@ -53,32 +87,10 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
         `).join('')}
       `;
+
     } catch (err) {
-      console.error('Error:', err);
-      container.innerHTML = '<p class="text-danger">Error al cargar datos.</p>';
+      console.error('Error al cargar estaciones:', err);
+      container.innerHTML = '<p class="text-danger">Error al cargar estaciones.</p>';
     }
-  };
-
-  // Cargar lista de CCPs
-  (async () => {
-    try {
-      const {  ccps, error } = await supabase
-        .from('ccps')
-        .select('nombre, codigo')
-        .order('nombre');
-
-      if (error) throw error;
-
-      select.innerHTML = '<option value="">-- Seleccione un CCP --</option>' +
-        ccps.map(ccp => `<option value="${ccp.codigo}">${ccp.nombre}</option>`).join('');
-    } catch (err) {
-      select.innerHTML = '<option>Error de conexión</option>';
-    }
-  })();
-
-  // Escuchar cambios
-  select.addEventListener('change', (e) => {
-    if (e.target.value) cargarEstaciones(e.target.value);
-    else container.innerHTML = '<p class="text-muted text-center">Seleccione un CCP para visualizar sus estaciones policiales.</p>';
   });
 });
