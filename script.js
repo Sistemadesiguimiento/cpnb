@@ -1,34 +1,21 @@
-// --- CARGAR SUPABASE CORRECTAMENTE EN NAVEGADOR ---
 document.addEventListener('DOMContentLoaded', async () => {
-  // 1. Cargar dinámicamente el SDK si no está presente
-  if (typeof window.supabase === 'undefined') {
-    await new Promise((resolve, reject) => {
-      const script = document.createElement('script');
-      script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
-      script.onload = resolve;
-      script.onerror = reject;
-      document.head.appendChild(script);
-    });
-  }
-
-  // 2. Inicializar cliente
+  // Inicializar cliente de Supabase (window.supabase ya existe gracias al script global)
   const { createClient } = window.supabase;
   const supabase = createClient(
     'https://hxkqbszmkxydxxtsvdqb.supabase.co',
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh4a3Fic3pta3h5ZHh4dHN2ZHFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0ODEyMTAsImV4cCI6MjA4MTA1NzIxMH0.Fs504W-L-KqtKcVfLx57BeMomPAMB5NZ_dsrF2YpBw8'
   );
 
-  // 3. Función para abrir mapa
+  // Función global para mapa
   window.abrirMapa = (lat, lng) => {
     window.open(`https://www.google.com/maps?q=${lat},${lng}&z=16`, '_blank');
   };
 
-  // 4. Obtener elementos
   const select = document.getElementById('ccpSelector');
   const container = document.getElementById('estacionesContainer');
   if (!select || !container) return;
 
-  // 5. Cargar CCPs
+  // Cargar CCPs
   try {
     const {  ccps, error } = await supabase
       .from('ccps')
@@ -43,10 +30,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   } catch (err) {
     console.error('Error al cargar CCPs:', err);
     select.innerHTML = '<option>Error de conexión</option>';
-    return;
   }
 
-  // 6. Cargar estaciones al cambiar selección
+  // Cargar estaciones al seleccionar
   select.addEventListener('change', async (e) => {
     const codigo = e.target.value;
     if (!codigo) {
@@ -54,7 +40,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    container.innerHTML = '<p class="text-muted">Cargando estaciones...</p>';
+    container.innerHTML = '<p class="text-muted">Cargando...</p>';
 
     try {
       const {  ccp, error: ccpErr } = await supabase
@@ -74,7 +60,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (estErr) throw estErr;
 
       if (estaciones.length === 0) {
-        container.innerHTML = '<p class="text-muted">No hay estaciones registradas para este CCP.</p>';
+        container.innerHTML = '<p class="text-muted">No hay estaciones registradas.</p>';
         return;
       }
 
