@@ -1,7 +1,8 @@
 document.addEventListener('DOMContentLoaded', async () => {
   // Verificar que Supabase se haya cargado
   if (!window.supabase) {
-    console.error('Supabase no está cargado. Verifica el orden de los scripts.');
+    console.error('❌ Supabase no está cargado. Asegúrate de que el script de Supabase esté antes que script.js.');
+    document.getElementById('ccpSelector').innerHTML = '<option>❌ Error: librería no cargada</option>';
     return;
   }
 
@@ -31,7 +32,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       data.map(ccp => `<option value="${ccp.codigo}">${ccp.nombre}</option>`).join('');
   } catch (err) {
     console.error('Error al cargar CCPs:', err.message);
-    select.innerHTML = '<option>Error de conexión</option>';
+    select.innerHTML = '<option>❌ Error al cargar CCPs</option>';
     return;
   }
 
@@ -66,6 +67,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
       }
 
+      // Usamos clases de Bootstrap para estética
       let html = '<h5 class="mb-3 fw-bold">Estaciones Policiales:</h5>';
       estaciones.forEach(est => {
         html += `
@@ -80,7 +82,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       container.innerHTML = html;
     } catch (err) {
       console.error('Error al cargar estaciones:', err.message);
-      container.innerHTML = '<p class="text-danger">Error al cargar estaciones. Intente nuevamente.</p>';
+      container.innerHTML = '<p class="text-danger">❌ Error al cargar estaciones. Ver consola para detalles.</p>';
     }
   });
 });
