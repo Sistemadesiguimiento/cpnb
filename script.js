@@ -1,13 +1,13 @@
 document.addEventListener('DOMContentLoaded', async () => {
   // 🔑 Reemplaza con tus credenciales reales de Supabase
-  const supabaseUrl = 'https://xxxxxxxxxxxx.supabase.co';
-  const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.xxxxxxxxx';
+  const supabaseUrl = 'https://hxkqbszmkxydxxtsvdqb.supabase.co';
+  const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh4a3Fic3pta3h5ZHh4dHN2ZHFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0ODEyMTAsImV4cCI6MjA4MTA1NzIxMH0.Fs504W-L-KqtKcVfLx57BeMomPAMB5NZ_dsrF2YpBw8';
 
   // ✅ Verificar que el CDN de Supabase haya cargado
   if (typeof window.supabase === 'undefined') {
     document.getElementById('estacionesContainer').innerHTML =
-      '<p class="text-danger text-center">❌ Error: Supabase no se cargó. Abre este archivo desde un servidor local (no con file://).</p>';
-    console.error('window.supabase no está definido. Usa http://localhost en lugar de file://');
+      '<p class="text-danger text-center">❌ Error: Supabase no se cargó. Verifique el CDN en index.html.</p>';
+    console.error('window.supabase no está definido. ¿Está el script de Supabase antes de script.js?');
     return;
   }
 
@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const ccpSelector = document.getElementById('ccpSelector');
   const estacionesContainer = document.getElementById('estacionesContainer');
 
-  // 🗂️ Cargar CCPs (tabla: ccp → columnas: id, nombre)
+  // 📥 Cargar CCPs (tabla: ccp → columnas: id, nombre)
   const { data: ccps, error: ccpError } = await client
     .from('ccp')
     .select('id, nombre')
@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  // 📥 Llenar el selector
+  // 📝 Llenar el selector
   ccpSelector.innerHTML = '<option value="">-- Seleccione un CCP --</option>';
   ccps.forEach(ccp => {
     const opt = document.createElement('option');
@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    const {  estaciones, error: estError } = await client
+    const { data: estaciones, error: estError } = await client
       .from('estaciones')
       .select('nombre')
       .eq('ccp_id', ccpId)
