@@ -1,14 +1,11 @@
 document.addEventListener('DOMContentLoaded', async () => {
-  // 🔑 Reemplaza con tus valores reales de Supabase
   const supabaseUrl = 'https://hxkqbszmkxydxxtsvdqb.supabase.co';
   const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh4a3Fic3pta3h5ZHh4dHN2ZHFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0ODEyMTAsImV4cCI6MjA4MTA1NzIxMH0.Fs504W-L-KqtKcVfLx57BeMomPAMB5NZ_dsrF2YpBw8';
 
-  // ✅ El CDN de Supabase exporta una función global llamada `supabase`
-  // (minúscula) en la versión UMD
   if (typeof window.supabase === 'undefined') {
     document.getElementById('estacionesContainer').innerHTML =
-      '<p class="text-danger text-center">❌ Error: Supabase no se cargó. Verifique la conexión a internet o el bloqueo de scripts.</p>';
-    console.error('Supabase no está disponible en window.supabase');
+      '<p class="text-danger text-center">❌ Error: Supabase no se cargó. Verifique conexión o bloqueo de scripts.</p>';
+    console.error('window.supabase no está definido. ¿Está el CDN cargado antes de script.js?');
     return;
   }
 
@@ -17,7 +14,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const ccpSelector = document.getElementById('ccpSelector');
   const estacionesContainer = document.getElementById('estacionesContainer');
 
-  // Cargar CCPs desde la tabla `ccp`
+  // Cargar CCPs
   const { data: ccps, error: ccpError } = await client
     .from('ccp')
     .select('id, nombre')
@@ -25,25 +22,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   if (ccpError) {
     estacionesContainer.innerHTML = `<p class="text-danger">Error al cargar CCPs: ${ccpError.message}</p>`;
-    console.error(ccpError);
     return;
   }
 
-  // Llenar el selector de CCP
   ccpSelector.innerHTML = '<option value="">-- Seleccione un CCP --</option>';
   ccps.forEach(ccp => {
-    const option = document.createElement('option');
-    option.value = ccp.id;
-    option.textContent = ccp.nombre;
-    ccpSelector.appendChild(option);
+    const opt = document.createElement('option');
+    opt.value = ccp.id;
+    opt.textContent = ccp.nombre;
+    ccpSelector.appendChild(opt);
   });
 
-  // Manejar selección de CCP
+  // Manejar selección
   ccpSelector.addEventListener('change', async () => {
-    const ccpId = ccpSelector.value;
+    const id = ccpSelector.value;
     estacionesContainer.innerHTML = '';
 
-    if (!ccpId) {
+    if (!id) {
       estacionesContainer.innerHTML = '<p class="text-muted text-center">Seleccione un CCP para visualizar sus estaciones policiales.</p>';
       return;
     }
@@ -51,12 +46,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     const { data: estaciones, error: estError } = await client
       .from('estaciones')
       .select('nombre')
-      .eq('ccp_id', ccpId)
+      .eq('ccp_id', id)
       .order('nombre', { ascending: true });
 
     if (estError) {
       estacionesContainer.innerHTML = `<p class="text-danger text-center">Error al cargar estaciones: ${estError.message}</p>`;
-      console.error(estError);
       return;
     }
 
