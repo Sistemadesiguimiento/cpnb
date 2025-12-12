@@ -63,6 +63,7 @@
   </style>
 </head>
 <body>
+  <!-- Cabecera institucional -->
   <header class="text-white text-center py-4 shadow-sm">
     <div class="container">
       <img src="LOGO-PNB.png" alt="Logo Policía Nacional Bolivariana" class="logo-pnb mb-3">
@@ -99,16 +100,16 @@
     </div>
   </footer>
 
-  <!-- Supabase CDN -->
+  <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.global.min.js"></script>
 
-  <!-- Lógica integrada -->
+  <!-- ✅ Lógica integrada directamente en index.html -->
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
       const supabaseUrl = 'https://hxkqbszmkxydxxtsvdqb.supabase.co';
       const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh4a3Fic3pta3h5ZHh4dHN2ZHFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0ODEyMTAsImV4cCI6MjA4MTA1NzIxMH0.Fs504W-L-KqtKcVfLx57BeMomPAMB5NZ_dsrF2YpBw8';
 
-      // ✅ Verificación correcta del objeto global
+      // ✅ Verificación correcta: el objeto global se llama "supabase" (minúscula)
       if (typeof supabase === 'undefined') {
         document.getElementById('estacionesContainer').innerHTML =
           '<p class="text-danger text-center">❌ Supabase no disponible. Verifique conexión o CDN.</p>';
@@ -120,7 +121,7 @@
       const ccpSelector = document.getElementById('ccpSelector');
       const estacionesContainer = document.getElementById('estacionesContainer');
 
-      // 📥 Cargar CCPs
+      // 🗂️ Cargar CCPs
       const { data: ccps, error: ccpError } = await client
         .from('ccp')
         .select('id, nombre')
@@ -139,7 +140,7 @@
         ccpSelector.appendChild(opt);
       });
 
-      // 🔍 Cargar estaciones al seleccionar CCP
+      // 🔍 Cargar estaciones al seleccionar
       ccpSelector.addEventListener('change', async () => {
         const ccpId = ccpSelector.value;
         estacionesContainer.innerHTML = '';
@@ -149,7 +150,7 @@
           return;
         }
 
-        const { data: estaciones, error: estError } = await client
+        const {  estaciones, error: estError } = await client
           .from('estaciones')
           .select('nombre')
           .eq('ccp_id', ccpId)
