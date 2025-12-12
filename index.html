@@ -29,9 +29,6 @@
       display: block;
       margin: 0 auto 1rem;
     }
-    h1, h2 {
-      font-weight: 700;
-    }
     .btn-pnb-gold {
       background-color: var(--pnb-gold);
       color: var(--pnb-blue-dark);
@@ -66,7 +63,6 @@
   </style>
 </head>
 <body>
-  <!-- Cabecera institucional -->
   <header class="text-white text-center py-4 shadow-sm">
     <div class="container">
       <img src="LOGO-PNB.png" alt="Logo Policía Nacional Bolivariana" class="logo-pnb mb-3">
@@ -103,37 +99,38 @@
     </div>
   </footer>
 
-  <!-- Supabase + lógica integrada -->
+  <!-- Supabase CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.global.min.js"></script>
+
+  <!-- Lógica integrada -->
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
+      // 🔑 Tus credenciales reales (ya verificadas en tus archivos)
       const supabaseUrl = 'https://hxkqbszmkxydxxtsvdqb.supabase.co';
       const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh4a3Fic3pta3h5ZHh4dHN2ZHFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0ODEyMTAsImV4cCI6MjA4MTA1NzIxMH0.Fs504W-L-KqtKcVfLx57BeMomPAMB5NZ_dsrF2YpBw8';
 
-      // ✅ Verificar que Supabase se haya cargado
-      if (typeof window.supabase === 'undefined') {
+      // ✅ Verificación robusta
+      if (typeof supabase === 'undefined') {
         document.getElementById('estacionesContainer').innerHTML =
-          '<p class="text-danger text-center">❌ Error: Supabase no se cargó. Verifique su conexión.</p>';
+          '<p class="text-danger text-center">❌ Supabase no disponible. Verifique conexión o CDN.</p>';
         return;
       }
 
-      const client = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
+      const client = supabase.createClient(supabaseUrl, supabaseAnonKey);
       const ccpSelector = document.getElementById('ccpSelector');
       const estacionesContainer = document.getElementById('estacionesContainer');
 
-      // 🗂️ Cargar CCPs desde la tabla `ccp`
+      // 🗂️ Cargar CCPs (tabla: ccp)
       const { data: ccps, error: ccpError } = await client
         .from('ccp')
         .select('id, nombre')
         .order('nombre', { ascending: true });
 
       if (ccpError) {
-        estacionesContainer.innerHTML = `<p class="text-danger text-center">Error al cargar CCPs: ${ccpError.message}</p>`;
-        console.error(ccpError);
+        estacionesContainer.innerHTML = `<p class="text-danger text-center">Error CCPs: ${ccpError.message}</p>`;
         return;
       }
 
-      // 📥 Llenar el selector
       ccpSelector.innerHTML = '<option value="">-- Seleccione un CCP --</option>';
       ccps.forEach(ccp => {
         const opt = document.createElement('option');
@@ -142,30 +139,29 @@
         ccpSelector.appendChild(opt);
       });
 
-      // 🔍 Al seleccionar un CCP, cargar sus estaciones
+      // 🔍 Cargar estaciones al seleccionar
       ccpSelector.addEventListener('change', async () => {
-        const ccpId = ccpSelector.value;
+        const id = ccpSelector.value;
         estacionesContainer.innerHTML = '';
 
-        if (!ccpId) {
-          estacionesContainer.innerHTML = '<p class="text-muted text-center">Seleccione un CCP para visualizar sus estaciones policiales.</p>';
+        if (!id) {
+          estacionesContainer.innerHTML = '<p class="text-muted text-center">Seleccione un CCP...</p>';
           return;
         }
 
-        const {  estaciones, error: estError } = await client
+        const {  estaciones, error: err } = await client
           .from('estaciones')
           .select('nombre')
-          .eq('ccp_id', ccpId)
+          .eq('ccp_id', id)
           .order('nombre', { ascending: true });
 
-        if (estError) {
-          estacionesContainer.innerHTML = `<p class="text-danger text-center">Error al cargar estaciones: ${estError.message}</p>`;
-          console.error(estError);
+        if (err) {
+          estacionesContainer.innerHTML = `<p class="text-danger text-center">Error estaciones: ${err.message}</p>`;
           return;
         }
 
         if (estaciones.length === 0) {
-          estacionesContainer.innerHTML = '<p class="text-muted text-center">Este CCP no tiene estaciones registradas.</p>';
+          estacionesContainer.innerHTML = '<p class="text-muted text-center">Sin estaciones para este CCP.</p>';
           return;
         }
 
@@ -181,6 +177,8 @@
       });
     });
   </script>
+
+  <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
