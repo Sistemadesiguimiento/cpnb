@@ -97,28 +97,25 @@
     </div>
   </footer>
 
-  <!-- ✅ CDN CORRECTO -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.global.min.js"></script>
-
-  <!-- ✅ LÓGICA CORREGIDA -->
+<!-- Reemplaza SOLO el script de Supabase y el bloque de lógica -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.global.min.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', async () => {
     const supabaseUrl = 'https://hxkqbszmkxydxxtsvdqb.supabase.co';
     const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh4a3Fic3pta3h5ZHh4dHN2ZHFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0ODEyMTAsImV4cCI6MjA4MTA1NzIxMH0.Fs504W-L-KqtKcVfLx57BeMomPAMB5NZ_dsrF2YpBw8';
 
-    // ✅ CORRECCIÓN 1: usar "Supabase" (mayúscula)
-    if (typeof Supabase === 'undefined') {
+    // ✅ Ahora SÍ: "supabase" (minúscula) existe
+    if (typeof supabase === 'undefined') {
       document.getElementById('estacionesContainer').innerHTML =
         '<p class="text-danger text-center">❌ Supabase no disponible. Verifique conexión o CDN.</p>';
-      console.error('El objeto global "Supabase" no está definido.');
+      console.error('El objeto global "supabase" no está definido.');
       return;
     }
 
-    const client = Supabase.createClient(supabaseUrl, supabaseAnonKey);
+    const client = supabase.createClient(supabaseUrl, supabaseAnonKey);
     const ccpSelector = document.getElementById('ccpSelector');
     const estacionesContainer = document.getElementById('estacionesContainer');
 
-    // 🗂️ Cargar CCPs
     const { data: ccps, error: ccpError } = await client
       .from('ccp')
       .select('id, nombre')
@@ -137,7 +134,6 @@
       ccpSelector.appendChild(opt);
     });
 
-    // 🔍 Cargar estaciones al seleccionar
     ccpSelector.addEventListener('change', async () => {
       const ccpId = ccpSelector.value;
       estacionesContainer.innerHTML = '';
@@ -147,7 +143,6 @@
         return;
       }
 
-      // ✅ CORRECCIÓN 2: usar "data: estaciones", no "{ estaciones }"
       const { data: estaciones, error: estError } = await client
         .from('estaciones')
         .select('nombre')
