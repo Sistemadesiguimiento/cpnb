@@ -7,8 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ✅ Correcto: el CDN define un objeto global llamado `supabase` (minúscula en v2+ UMD)
   // ¡NO "Supabase"! En la versión UMD global, se llama `supabase`
-  const _supabase = supabase.createClient(supabaseUrl, supabaseAnonKey);
-
+  const { data: { session }, error: sessionError } = await client.auth.getSession();
   const ccpSelector = document.getElementById('ccpSelector');
   const estacionesContainer = document.getElementById('estacionesContainer');
 
