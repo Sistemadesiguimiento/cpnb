@@ -13,31 +13,25 @@
       --pnb-gold: #d4af37;
       --pnb-light: #f8f9fa;
     }
-
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background-color: #f0f4f8;
     }
-
     header {
       background-color: var(--pnb-blue);
       color: white;
       padding: 2rem 0;
       box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
-
     .logo-pnb {
-      height: 120px; /* Aumentado para hacerlo más grande */
+      height: 120px;
       width: auto;
       display: block;
-      margin: 0 auto 1rem; /* Centrado horizontal y margen inferior */
-      /* Sin borde blanco */
+      margin: 0 auto 1rem;
     }
-
     h1, h2 {
       font-weight: 700;
     }
-
     .btn-pnb-gold {
       background-color: var(--pnb-gold);
       color: var(--pnb-blue-dark);
@@ -48,26 +42,22 @@
       background-color: #c19a2f;
       color: white;
     }
-
     .card {
       border-radius: 12px;
       border: none;
       box-shadow: 0 4px 12px rgba(0,0,0,0.08);
     }
-
     .card-header {
       background-color: var(--pnb-blue);
       color: white;
       font-weight: 600;
     }
-
     .form-select {
       border-radius: 8px;
       border: 1px solid #ced4da;
       padding: 0.5rem 1rem;
       font-size: 1.1rem;
     }
-
     footer {
       background-color: var(--pnb-blue-dark);
       color: white;
@@ -77,13 +67,13 @@
 </head>
 <body>
   <!-- Cabecera institucional -->
-<header class="bg-pnb-dark text-white text-center py-4 shadow-sm">
-  <div class="container">
-    <img src="LOGO-PNB.png" alt="Logo Policía Nacional Bolivariana" class="logo-pnb mb-3">
-    <h1 class="display-6 fw-bold text-center">Sistema de Seguimiento GPS</h1>
-    <p class="lead mb-0 text-center">Centro de Coordinación Policial - Estado Zulia</p>
-  </div>
-</header>
+  <header class="text-white text-center py-4 shadow-sm">
+    <div class="container">
+      <img src="LOGO-PNB.png" alt="Logo Policía Nacional Bolivariana" class="logo-pnb mb-3">
+      <h1 class="display-6 fw-bold text-center">Sistema de Seguimiento GPS</h1>
+      <p class="lead mb-0 text-center">Centro de Coordinación Policial - Estado Zulia</p>
+    </div>
+  </header>
 
   <div class="container py-4">
     <div class="text-center mb-5">
@@ -113,9 +103,85 @@
     </div>
   </footer>
 
-<!-- Scripts -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.global.min.js"></script>
-<script src="script.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Supabase + lógica integrada -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.global.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      // 🔑 Tus credenciales reales de Supabase (ya incluidas)
+      const supabaseUrl = 'https://hxkqbszmkxydxxtsvdqb.supabase.co';
+      const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh4a3Fic3pta3h5ZHh4dHN2ZHFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0ODEyMTAsImV4cCI6MjA4MTA1NzIxMH0.Fs504W-L-KqtKcVfLx57BeMomPAMB5NZ_dsrF2YpBw8';
+
+      // ✅ Verificar que Supabase se haya cargado
+      if (typeof window.supabase === 'undefined') {
+        document.getElementById('estacionesContainer').innerHTML =
+          '<p class="text-danger text-center">❌ Error: Supabase no se cargó. Verifique su conexión.</p>';
+        return;
+      }
+
+      const client = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
+      const ccpSelector = document.getElementById('ccpSelector');
+      const estacionesContainer = document.getElementById('estacionesContainer');
+
+      // 🗂️ Cargar CCPs desde la tabla `ccp`
+      const { data: ccps, error: ccpError } = await client
+        .from('ccp')
+        .select('id, nombre')
+        .order('nombre', { ascending: true });
+
+      if (ccpError) {
+        estacionesContainer.innerHTML = `<p class="text-danger text-center">Error al cargar CCPs: ${ccpError.message}</p>`;
+        console.error(ccpError);
+        return;
+      }
+
+      // 📥 Llenar el selector
+      ccpSelector.innerHTML = '<option value="">-- Seleccione un CCP --</option>';
+      ccps.forEach(ccp => {
+        const opt = document.createElement('option');
+        opt.value = ccp.id;
+        opt.textContent = ccp.nombre;
+        ccpSelector.appendChild(opt);
+      });
+
+      // 🔍 Al seleccionar un CCP, cargar sus estaciones
+      ccpSelector.addEventListener('change', async () => {
+        const ccpId = ccpSelector.value;
+        estacionesContainer.innerHTML = '';
+
+        if (!ccpId) {
+          estacionesContainer.innerHTML = '<p class="text-muted text-center">Seleccione un CCP para visualizar sus estaciones policiales.</p>';
+          return;
+        }
+
+        const {  estaciones, error: estError } = await client
+          .from('estaciones')
+          .select('nombre')
+          .eq('ccp_id', ccpId)
+          .order('nombre', { ascending: true });
+
+        if (estError) {
+          estacionesContainer.innerHTML = `<p class="text-danger text-center">Error al cargar estaciones: ${estError.message}</p>`;
+          console.error(estError);
+          return;
+        }
+
+        if (estaciones.length === 0) {
+          estacionesContainer.innerHTML = '<p class="text-muted text-center">Este CCP no tiene estaciones registradas.</p>';
+          return;
+        }
+
+        const ul = document.createElement('ul');
+        ul.className = 'list-group';
+        estaciones.forEach(e => {
+          const li = document.createElement('li');
+          li.className = 'list-group-item';
+          li.textContent = e.nombre;
+          ul.appendChild(li);
+        });
+        estacionesContainer.appendChild(ul);
+      });
+    });
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
