@@ -1,34 +1,34 @@
 document.addEventListener('DOMContentLoaded', async () => {
-  // 🔑 Reemplaza con tus credenciales reales de Supabase
+  // 🔑 REEMPLAZA ESTOS VALORES CON LOS DE TU PROYECTO EN SUPABASE
   const supabaseUrl = 'https://hxkqbszmkxydxxtsvdqb.supabase.co';
   const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh4a3Fic3pta3h5ZHh4dHN2ZHFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0ODEyMTAsImV4cCI6MjA4MTA1NzIxMH0.Fs504W-L-KqtKcVfLx57BeMomPAMB5NZ_dsrF2YpBw8';
 
-  // ✅ Verificar que el CDN de Supabase haya cargado
+  // ✅ Verificar que el CDN haya cargado correctamente
   if (typeof window.supabase === 'undefined') {
     document.getElementById('estacionesContainer').innerHTML =
-      '<p class="text-danger text-center">❌ Error: Supabase no se cargó. Verifique el CDN en index.html.</p>';
-    console.error('window.supabase no está definido. ¿Está el script de Supabase antes de script.js?');
+      '<p class="text-danger text-center">❌ Error crítico: Supabase no se cargó. Verifique el orden de los scripts en index.html.</p>';
+    console.error('El objeto global window.supabase no está definido.');
     return;
   }
 
+  // 🧩 Crear cliente de Supabase
   const client = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
 
   const ccpSelector = document.getElementById('ccpSelector');
   const estacionesContainer = document.getElementById('estacionesContainer');
 
-  // 📥 Cargar CCPs (tabla: ccp → columnas: id, nombre)
-  const { data: ccps, error: ccpError } = await client
+  // 🗂️ Cargar CCPs (tabla: ccp → columnas: id, nombre)
+  const {  ccps, error: ccpError } = await client
     .from('ccp')
     .select('id, nombre')
     .order('nombre', { ascending: true });
 
   if (ccpError) {
     estacionesContainer.innerHTML = `<p class="text-danger">Error al cargar CCPs: ${ccpError.message}</p>`;
-    console.error(ccpError);
     return;
   }
 
-  // 📝 Llenar el selector
+  // 📥 Llenar el selector
   ccpSelector.innerHTML = '<option value="">-- Seleccione un CCP --</option>';
   ccps.forEach(ccp => {
     const opt = document.createElement('option');
@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    const { data: estaciones, error: estError } = await client
+    const {  estaciones, error: estError } = await client
       .from('estaciones')
       .select('nombre')
       .eq('ccp_id', ccpId)
@@ -55,7 +55,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (estError) {
       estacionesContainer.innerHTML = `<p class="text-danger text-center">Error al cargar estaciones: ${estError.message}</p>`;
-      console.error(estError);
       return;
     }
 
