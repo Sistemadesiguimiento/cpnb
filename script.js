@@ -1,18 +1,23 @@
-// script.js — ¡Este debe ser un archivo .js puro!
-
 document.addEventListener('DOMContentLoaded', () => {
-  // 🔑 Reemplaza con tus credenciales reales de Supabase
-  const supabaseUrl = 'https://hxkqbszmkxydxxtsvdqb.supabase.co';
-  const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh4a3Fic3pta3h5ZHh4dHN2ZHFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0ODEyMTAsImV4cCI6MjA4MTA1NzIxMH0.Fs504W-L-KqtKcVfLx57BeMomPAMB5NZ_dsrF2YpBw8';
+  // 🔑 Reemplaza con tus valores reales de Supabase
+  const supabaseUrl = 'https://xxxxxxxxxxxxx.supabase.co';
+  const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.xxxxx';
 
-  // ✅ Correcto: el CDN define un objeto global llamado `supabase` (minúscula en v2+ UMD)
-  // ¡NO "Supabase"! En la versión UMD global, se llama `supabase`
-  const { data: { session }, error: sessionError } = await client.auth.getSession();
+  // ⚠️ IMPORTANTE: en la versión UMD global, el nombre correcto es "supabase"
+  // pero se expone como propiedad de `window`, y a veces hay confusión.
+  // La forma segura es accederlo desde `window.supabase`
+  if (typeof window.supabase === 'undefined') {
+    console.error('❌ Supabase no está cargado. Verifica el orden de los scripts.');
+    return;
+  }
+
+  const client = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
+
   const ccpSelector = document.getElementById('ccpSelector');
   const estacionesContainer = document.getElementById('estacionesContainer');
 
   async function cargarCCPs() {
-    const { data, error } = await _supabase.from('ccp').select('id, nombre').order('nombre', { ascending: true });
+    const { data, error } = await client.from('ccp').select('id, nombre').order('nombre', { ascending: true });
     if (error) {
       console.error('Error al cargar CCPs:', error);
       return;
@@ -36,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    const { data, error } = await _supabase
+    const { data, error } = await client
       .from('estaciones')
       .select('nombre')
       .eq('ccp_id', ccpId)
