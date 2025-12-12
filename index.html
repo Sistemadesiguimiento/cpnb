@@ -97,13 +97,11 @@
       Sistema de Seguimiento GPS - Desarrollado con fines operativos
     </div>
   </footer>
-  <!-- Scripts -->
- <script>
+<script>
   document.addEventListener('DOMContentLoaded', async () => {
     const supabaseUrl = 'https://hxkqbszmkxydxxtsvdqb.supabase.co';
     const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh4a3Fic3pta3h5ZHh4dHN2ZHFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0ODEyMTAsImV4cCI6MjA4MTA1NzIxMH0.Fs504W-L-KqtKcVfLx57BeMomPAMB5NZ_dsrF2YpBw8';
 
-    // ✅ Verificación CORRECTA: el objeto global se llama "Supabase" (con mayúscula)
     if (typeof Supabase === 'undefined') {
       document.getElementById('estacionesContainer').innerHTML =
         '<p class="text-danger text-center">❌ Supabase no disponible. Verifique conexión o CDN.</p>';
@@ -134,7 +132,7 @@
       ccpSelector.appendChild(opt);
     });
 
-    // 🔍 Cargar estaciones al seleccionar un CCP
+    // 🔍 Cargar estaciones al seleccionar
     ccpSelector.addEventListener('change', async () => {
       const ccpId = ccpSelector.value;
       estacionesContainer.innerHTML = '';
@@ -144,7 +142,6 @@
         return;
       }
 
-      // ❗ Aquí estaba el error: debes destructurar "data", no "estaciones"
       const { data: estaciones, error: estError } = await client
         .from('estaciones')
         .select('nombre')
