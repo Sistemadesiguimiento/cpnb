@@ -97,15 +97,15 @@
     </div>
   </footer>
 
-  <!-- ✅ CDN FIJO que SÍ expone "supabase" (minúscula) -->
+  <!-- ✅ CDN FIJO y SIN ESPACIOS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.global.min.js"></script>
 
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
+      // ✅ URLs SIN espacios al final
       const supabaseUrl = 'https://hxkqbszmkxydxxtsvdqb.supabase.co';
       const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh4a3Fic3pta3h5ZHh4dHN2ZHFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0ODEyMTAsImV4cCI6MjA4MTA1NzIxMH0.Fs504W-L-KqtKcVfLx57BeMomPAMB5NZ_dsrF2YpBw8';
 
-      // ✅ Verificación correcta: "supabase" (minúscula)
       if (typeof supabase === 'undefined') {
         document.getElementById('estacionesContainer').innerHTML =
           '<p class="text-danger text-center">❌ Supabase no disponible. Verifique conexión o CDN.</p>';
@@ -117,8 +117,8 @@
       const ccpSelector = document.getElementById('ccpSelector');
       const estacionesContainer = document.getElementById('estacionesContainer');
 
-      // 🗂️ Cargar CCPs
-      const {  ccps, error: ccpError } = await client
+      // ✅ CORRECCIÓN: usar "data: ccps"
+      const { data: ccps, error: ccpError } = await client
         .from('ccp')
         .select('id, nombre')
         .order('nombre', { ascending: true });
@@ -136,7 +136,6 @@
         ccpSelector.appendChild(opt);
       });
 
-      // 🔍 Cargar estaciones al seleccionar
       ccpSelector.addEventListener('change', async () => {
         const ccpId = ccpSelector.value;
         estacionesContainer.innerHTML = '';
@@ -146,7 +145,8 @@
           return;
         }
 
-        const {  estaciones, error: estError } = await client
+        // ✅ CORRECCIÓN: usar "data: estaciones"
+        const { data: estaciones, error: estError } = await client
           .from('estaciones')
           .select('nombre')
           .eq('ccp_id', ccpId)
