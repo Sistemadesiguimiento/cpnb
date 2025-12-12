@@ -103,15 +103,12 @@
     document.addEventListener('DOMContentLoaded', async () => {
       const supabaseUrl = 'https://hxkqbszmkxydxxtsvdqb.supabase.co';
       const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh4a3Fic3pta3h5ZHh4dHN2ZHFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0ODEyMTAsImV4cCI6MjA4MTA1NzIxMH0.Fs504W-L-KqtKcVfLx57BeMomPAMB5NZ_dsrF2YpBw8';
-
-      // ✅ CORRECCIÓN 1: verificar Supabase (con mayúscula)
-      if (typeof Supabase === 'undefined') {
-        document.getElementById('estacionesContainer').innerHTML =
-          '<p class="text-danger text-center">❌ Supabase no disponible. Verifique conexión o CDN.</p>';
-        console.error('El objeto global "Supabase" no está definido.');
-        return;
-      }
-
+     if (typeof Supabase === 'undefined') {
+  document.getElementById('estacionesContainer').innerHTML =
+    '<p class="text-danger text-center">❌ Supabase no disponible. Verifique conexión o CDN.</p>';
+  console.error('El objeto global "Supabase" no está definido.');
+  return;
+}
       // ✅ CORRECCIÓN 2: usar Supabase.createClient
       const client = Supabase.createClient(supabaseUrl, supabaseAnonKey);
       const ccpSelector = document.getElementById('ccpSelector');
