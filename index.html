@@ -98,80 +98,80 @@
     </div>
   </footer>
   <!-- Scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.global.min.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', async () => {
-      const supabaseUrl = 'https://hxkqbszmkxydxxtsvdqb.supabase.co';
-      const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh4a3Fic3pta3h5ZHh4dHN2ZHFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0ODEyMTAsImV4cCI6MjA4MTA1NzIxMH0.Fs504W-L-KqtKcVfLx57BeMomPAMB5NZ_dsrF2YpBw8';
-     if (typeof Supabase === 'undefined') {
-  document.getElementById('estacionesContainer').innerHTML =
-    '<p class="text-danger text-center">❌ Supabase no disponible. Verifique conexión o CDN.</p>';
-  console.error('El objeto global "Supabase" no está definido.');
-  return;
-}
-      // ✅ CORRECCIÓN 2: usar Supabase.createClient
-      const client = Supabase.createClient(supabaseUrl, supabaseAnonKey);
-      const ccpSelector = document.getElementById('ccpSelector');
-      const estacionesContainer = document.getElementById('estacionesContainer');
+ <script>
+  document.addEventListener('DOMContentLoaded', async () => {
+    const supabaseUrl = 'https://hxkqbszmkxydxxtsvdqb.supabase.co';
+    const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh4a3Fic3pta3h5ZHh4dHN2ZHFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0ODEyMTAsImV4cCI6MjA4MTA1NzIxMH0.Fs504W-L-KqtKcVfLx57BeMomPAMB5NZ_dsrF2YpBw8';
 
-      // 🗂️ Cargar CCPs
-      const { data: ccps, error: ccpError } = await client
-        .from('ccp')
-        .select('id, nombre')
-        .order('nombre', { ascending: true });
+    // ✅ Verificación CORRECTA: el objeto global se llama "Supabase" (con mayúscula)
+    if (typeof Supabase === 'undefined') {
+      document.getElementById('estacionesContainer').innerHTML =
+        '<p class="text-danger text-center">❌ Supabase no disponible. Verifique conexión o CDN.</p>';
+      console.error('El objeto global "Supabase" no está definido. ¿Está cargado el CDN?');
+      return;
+    }
 
-      if (ccpError) {
-        estacionesContainer.innerHTML = `<p class="text-danger text-center">Error al cargar CCPs: ${ccpError.message}</p>`;
+    const client = Supabase.createClient(supabaseUrl, supabaseAnonKey);
+    const ccpSelector = document.getElementById('ccpSelector');
+    const estacionesContainer = document.getElementById('estacionesContainer');
+
+    // 🗂️ Cargar CCPs
+    const { data: ccps, error: ccpError } = await client
+      .from('ccp')
+      .select('id, nombre')
+      .order('nombre', { ascending: true });
+
+    if (ccpError) {
+      estacionesContainer.innerHTML = `<p class="text-danger text-center">Error al cargar CCPs: ${ccpError.message}</p>`;
+      return;
+    }
+
+    ccpSelector.innerHTML = '<option value="">-- Seleccione un CCP --</option>';
+    ccps.forEach(ccp => {
+      const opt = document.createElement('option');
+      opt.value = ccp.id;
+      opt.textContent = ccp.nombre;
+      ccpSelector.appendChild(opt);
+    });
+
+    // 🔍 Cargar estaciones al seleccionar un CCP
+    ccpSelector.addEventListener('change', async () => {
+      const ccpId = ccpSelector.value;
+      estacionesContainer.innerHTML = '';
+
+      if (!ccpId) {
+        estacionesContainer.innerHTML = '<p class="text-muted text-center">Seleccione un CCP para visualizar sus estaciones policiales.</p>';
         return;
       }
 
-      ccpSelector.innerHTML = '<option value="">-- Seleccione un CCP --</option>';
-      ccps.forEach(ccp => {
-        const opt = document.createElement('option');
-        opt.value = ccp.id;
-        opt.textContent = ccp.nombre;
-        ccpSelector.appendChild(opt);
+      // ❗ Aquí estaba el error: debes destructurar "data", no "estaciones"
+      const { data: estaciones, error: estError } = await client
+        .from('estaciones')
+        .select('nombre')
+        .eq('ccp_id', ccpId)
+        .order('nombre', { ascending: true });
+
+      if (estError) {
+        estacionesContainer.innerHTML = `<p class="text-danger text-center">Error al cargar estaciones: ${estError.message}</p>`;
+        return;
+      }
+
+      if (estaciones.length === 0) {
+        estacionesContainer.innerHTML = '<p class="text-muted text-center">Este CCP no tiene estaciones registradas.</p>';
+        return;
+      }
+
+      const ul = document.createElement('ul');
+      ul.className = 'list-group';
+      estaciones.forEach(e => {
+        const li = document.createElement('li');
+        li.className = 'list-group-item';
+        li.textContent = e.nombre;
+        ul.appendChild(li);
       });
-
-      // 🔍 Cargar estaciones al seleccionar
-      ccpSelector.addEventListener('change', async () => {
-        const ccpId = ccpSelector.value;
-        estacionesContainer.innerHTML = '';
-
-        if (!ccpId) {
-          estacionesContainer.innerHTML = '<p class="text-muted text-center">Seleccione un CCP para visualizar sus estaciones policiales.</p>';
-          return;
-        }
-
-        // ✅ CORRECCIÓN 3: el objeto devuelto se llama "data", no "estaciones"
-        const { data: estaciones, error: estError } = await client
-          .from('estaciones')
-          .select('nombre')
-          .eq('ccp_id', ccpId)
-          .order('nombre', { ascending: true });
-
-        if (estError) {
-          estacionesContainer.innerHTML = `<p class="text-danger text-center">Error al cargar estaciones: ${estError.message}</p>`;
-          return;
-        }
-
-        if (estaciones.length === 0) {
-          estacionesContainer.innerHTML = '<p class="text-muted text-center">Este CCP no tiene estaciones registradas.</p>';
-          return;
-        }
-
-        const ul = document.createElement('ul');
-        ul.className = 'list-group';
-        estaciones.forEach(e => {
-          const li = document.createElement('li');
-          li.className = 'list-group-item';
-          li.textContent = e.nombre;
-          ul.appendChild(li);
-        });
-        estacionesContainer.appendChild(ul);
-      });
+      estacionesContainer.appendChild(ul);
     });
-  </script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  });
+</script>
 </body>
 </html>
