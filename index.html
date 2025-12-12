@@ -97,80 +97,84 @@
     </div>
   </footer>
 
-<!-- Reemplaza SOLO el script de Supabase y el bloque de lógica -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.global.min.js"></script>
-<script>
-  document.addEventListener('DOMContentLoaded', async () => {
-    const supabaseUrl = 'https://hxkqbszmkxydxxtsvdqb.supabase.co';
-    const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh4a3Fic3pta3h5ZHh4dHN2ZHFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0ODEyMTAsImV4cCI6MjA4MTA1NzIxMH0.Fs504W-L-KqtKcVfLx57BeMomPAMB5NZ_dsrF2YpBw8';
+  <!-- ✅ CDN FIJO que SÍ expone "supabase" (minúscula) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.global.min.js"></script>
 
-    // ✅ Ahora SÍ: "supabase" (minúscula) existe
-    if (typeof supabase === 'undefined') {
-      document.getElementById('estacionesContainer').innerHTML =
-        '<p class="text-danger text-center">❌ Supabase no disponible. Verifique conexión o CDN.</p>';
-      console.error('El objeto global "supabase" no está definido.');
-      return;
-    }
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const supabaseUrl = 'https://hxkqbszmkxydxxtsvdqb.supabase.co';
+      const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh4a3Fic3pta3h5ZHh4dHN2ZHFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0ODEyMTAsImV4cCI6MjA4MTA1NzIxMH0.Fs504W-L-KqtKcVfLx57BeMomPAMB5NZ_dsrF2YpBw8';
 
-    const client = supabase.createClient(supabaseUrl, supabaseAnonKey);
-    const ccpSelector = document.getElementById('ccpSelector');
-    const estacionesContainer = document.getElementById('estacionesContainer');
-
-    const { data: ccps, error: ccpError } = await client
-      .from('ccp')
-      .select('id, nombre')
-      .order('nombre', { ascending: true });
-
-    if (ccpError) {
-      estacionesContainer.innerHTML = `<p class="text-danger text-center">Error al cargar CCPs: ${ccpError.message}</p>`;
-      return;
-    }
-
-    ccpSelector.innerHTML = '<option value="">-- Seleccione un CCP --</option>';
-    ccps.forEach(ccp => {
-      const opt = document.createElement('option');
-      opt.value = ccp.id;
-      opt.textContent = ccp.nombre;
-      ccpSelector.appendChild(opt);
-    });
-
-    ccpSelector.addEventListener('change', async () => {
-      const ccpId = ccpSelector.value;
-      estacionesContainer.innerHTML = '';
-
-      if (!ccpId) {
-        estacionesContainer.innerHTML = '<p class="text-muted text-center">Seleccione un CCP para visualizar sus estaciones policiales.</p>';
+      // ✅ Verificación correcta: "supabase" (minúscula)
+      if (typeof supabase === 'undefined') {
+        document.getElementById('estacionesContainer').innerHTML =
+          '<p class="text-danger text-center">❌ Supabase no disponible. Verifique conexión o CDN.</p>';
+        console.error('El objeto global "supabase" no está definido.');
         return;
       }
 
-      const { data: estaciones, error: estError } = await client
-        .from('estaciones')
-        .select('nombre')
-        .eq('ccp_id', ccpId)
+      const client = supabase.createClient(supabaseUrl, supabaseAnonKey);
+      const ccpSelector = document.getElementById('ccpSelector');
+      const estacionesContainer = document.getElementById('estacionesContainer');
+
+      // 🗂️ Cargar CCPs
+      const {  ccps, error: ccpError } = await client
+        .from('ccp')
+        .select('id, nombre')
         .order('nombre', { ascending: true });
 
-      if (estError) {
-        estacionesContainer.innerHTML = `<p class="text-danger text-center">Error al cargar estaciones: ${estError.message}</p>`;
+      if (ccpError) {
+        estacionesContainer.innerHTML = `<p class="text-danger text-center">Error al cargar CCPs: ${ccpError.message}</p>`;
         return;
       }
 
-      if (estaciones.length === 0) {
-        estacionesContainer.innerHTML = '<p class="text-muted text-center">Este CCP no tiene estaciones registradas.</p>';
-        return;
-      }
-
-      const ul = document.createElement('ul');
-      ul.className = 'list-group';
-      estaciones.forEach(e => {
-        const li = document.createElement('li');
-        li.className = 'list-group-item';
-        li.textContent = e.nombre;
-        ul.appendChild(li);
+      ccpSelector.innerHTML = '<option value="">-- Seleccione un CCP --</option>';
+      ccps.forEach(ccp => {
+        const opt = document.createElement('option');
+        opt.value = ccp.id;
+        opt.textContent = ccp.nombre;
+        ccpSelector.appendChild(opt);
       });
-      estacionesContainer.appendChild(ul);
+
+      // 🔍 Cargar estaciones al seleccionar
+      ccpSelector.addEventListener('change', async () => {
+        const ccpId = ccpSelector.value;
+        estacionesContainer.innerHTML = '';
+
+        if (!ccpId) {
+          estacionesContainer.innerHTML = '<p class="text-muted text-center">Seleccione un CCP para visualizar sus estaciones policiales.</p>';
+          return;
+        }
+
+        const {  estaciones, error: estError } = await client
+          .from('estaciones')
+          .select('nombre')
+          .eq('ccp_id', ccpId)
+          .order('nombre', { ascending: true });
+
+        if (estError) {
+          estacionesContainer.innerHTML = `<p class="text-danger text-center">Error al cargar estaciones: ${estError.message}</p>`;
+          return;
+        }
+
+        if (estaciones.length === 0) {
+          estacionesContainer.innerHTML = '<p class="text-muted text-center">Este CCP no tiene estaciones registradas.</p>';
+          return;
+        }
+
+        const ul = document.createElement('ul');
+        ul.className = 'list-group';
+        estaciones.forEach(e => {
+          const li = document.createElement('li');
+          li.className = 'list-group-item';
+          li.textContent = e.nombre;
+          ul.appendChild(li);
+        });
+        estacionesContainer.appendChild(ul);
+      });
     });
-  });
-</script>
+  </script>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
