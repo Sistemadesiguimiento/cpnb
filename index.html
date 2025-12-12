@@ -108,14 +108,14 @@
       const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpqYnZ2em5jY2V1b3R3bXlldmlhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0OTU3NTQsImV4cCI6MjA4MTA3MTc1NH0.oDFjh6P_1W24dewi-FXJunewjcz7DQUnw6FaD9CoEMs';
 
       // ✅ CORRECTO: "Supabase" con mayúscula
-      if (typeof Supabase === 'undefined') {
-        document.getElementById('estacionesContainer').innerHTML =
-          '<p class="text-danger text-center">❌ Supabase no disponible. Verifique conexión o CDN.</p>';
-        console.error('El objeto global "Supabase" no está definido.');
-        return;
-      }
-
-      const client = Supabase.createClient(supabaseUrl, supabaseAnonKey);
+     // ✅ ESTO ESTÁ BIEN
+if (typeof Supabase === 'undefined') {
+  document.getElementById('estacionesContainer').innerHTML =
+    '<p class="text-danger text-center">❌ Supabase no disponible. Verifique conexión o CDN.</p>';
+  console.error('El objeto global "Supabase" no está definido.');
+  return;
+}
+const client = Supabase.createClient(supabaseUrl, supabaseAnonKey);
       const ccpSelector = document.getElementById('ccpSelector');
       const estacionesContainer = document.getElementById('estacionesContainer');
 
